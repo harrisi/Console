@@ -2,11 +2,13 @@
 //
 
 #include "stdafx.h"
-
+#include <SDL.h>
 
 int
-main()
+main(int argc, char *argv[])
 {
+	if (SDL_Init(SDL_INIT_VIDEO))
+		return -1;
+
     return 0;
 }
-

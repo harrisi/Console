@@ -75,8 +75,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\Sid\Documents\Visual Studio 2017\Projects\Console\glfw-3.2.1\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Sid\Documents\Visual Studio 2017\Projects\Console\glfw-3.2.1\src\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\Sid\Documents\Visual Studio 2017\Projects\Console\SDL2-2.0.5\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Sid\Documents\Visual Studio 2017\Projects\Console\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -104,7 +104,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
