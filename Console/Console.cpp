@@ -5,6 +5,8 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
+#include <ft2build.h>
+
 int
 main(int argc, char *argv[])
 {
