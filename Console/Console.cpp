@@ -54,5 +54,11 @@ main(int argc, char *argv[])
 			SDL_Quit();
 			return 0;
 		}
+
+		if (event.type == SDL_WINDOWEVENT) {
+			switch (event.window.event) {
+
+			}
+		}
 	}
 }

@@ -1,3 +1,6 @@
 [submodule "SDL2-2.0.5"]
 	path = SDL2-2.0.5
 	url = https://github.com/R030t1/SDL2-2.0.5
+[submodule "freetype2"]
+	path = freetype2
+	url = https://git.savannah.nongnu.org/git/freetype/freetype2.git
