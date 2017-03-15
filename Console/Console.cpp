@@ -2,11 +2,14 @@
 //
 
 #include "stdafx.h"
-#include <gl/GL.h>
-#include <GLFW/glfw3.h>
+#include <GLFW\glfw3.h>
 
-int main()
+int
+main()
 {
+	if (!glfwInit())
+		return -1;
+
     return 0;
 }
 
