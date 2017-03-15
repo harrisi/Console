@@ -2,10 +2,31 @@
 //
 
 #include "stdafx.h"
+#include <string>
+#include <iostream>
 #include <SDL.h>
 #include <SDL_opengl.h>
-
 #include <ft2build.h>
+
+using namespace std;
+
+class glyph {
+public:
+	int texture_id;
+	glyph();
+	void from_string(string codepoint);
+};
+
+glyph::glyph()
+{
+
+}
+
+void
+glyph::from_string(string codepoint)
+{
+
+}
 
 int
 main(int argc, char *argv[])
@@ -59,8 +80,13 @@ main(int argc, char *argv[])
 
 		if (event.type == SDL_WINDOWEVENT) {
 			switch (event.window.event) {
-
 			}
+		}
+
+		if (event.type == SDL_KEYDOWN) {
+			if (event.key.repeat)
+				continue;
+			cout << event.key.keysym.sym << std::endl;
 		}
 	}
 }
