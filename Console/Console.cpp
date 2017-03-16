@@ -38,24 +38,13 @@ main(int argc, char *argv[])
 	if (SDL_Init(SDL_INIT_VIDEO))
 		return -1;
 
+	// TODO: Use OpenGL 4 features only.
+	// TODO: Better error handling.
 	window = SDL_CreateWindow("Console", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
 	if (!window) {
 		SDL_Quit();
 		return -1;
 	}
-
-	// TODO: Use OpenGL 4 features only.
-	// TODO: Better error handling.
-	//if (!SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1))
-	//	return -2;
-	//if (!SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE))
-	//	return -3;
-	//if (!SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1))
-	//	return -4;
-	//if (!SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3))
-	//	return -5;
-	//if (!SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5))
-	//	return -6;
 
 	if (!SDL_GL_SetSwapInterval(1)) {
 		SDL_Quit();
@@ -72,21 +61,32 @@ main(int argc, char *argv[])
 	glClear(GL_COLOR_BUFFER_BIT);
 	SDL_GL_SwapWindow(window);
 
+	// TODO: Better event handling mechanism.
+	// TODO: Create a window and game logic class?
 	while (SDL_WaitEvent(&event)) {
-		if (event.type == SDL_QUIT) {
-			SDL_Quit();
-			return 0;
+		switch (event.type) {
+		case SDL_QUIT: {
+			break;
 		}
-
-		if (event.type == SDL_WINDOWEVENT) {
+		case SDL_WINDOWEVENT: {
 			switch (event.window.event) {
-			}
-		}
 
-		if (event.type == SDL_KEYDOWN) {
+			}
+			break;
+		}
+		case SDL_KEYDOWN: {
 			if (event.key.repeat)
 				continue;
+
 			cout << event.key.keysym.sym << std::endl;
+			switch (event.key.keysym.sym) {
+			case SDLK_ESCAPE: {
+				SDL_Quit();
+				return 0;
+			}
+			}
+			break;
+		}
 		}
 	}
 }
