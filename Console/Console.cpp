@@ -28,6 +28,14 @@ glyph::from_string(string codepoint)
 
 }
 
+void
+render(SDL_Window *window)
+{
+	glClearColor(0.1f, 0.2f, 0.5f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	SDL_GL_SwapWindow(window);
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -46,6 +54,10 @@ main(int argc, char *argv[])
 		return -1;
 	}
 
+	// TODO: Find proper event for window drawing.
+	//   It is possible that it will only be necessary
+	// to draw when information on the screen is updated
+	// as there is no physics loop.
 	if (!SDL_GL_SetSwapInterval(1)) {
 		SDL_Quit();
 		return -1;
@@ -57,10 +69,6 @@ main(int argc, char *argv[])
 		return -1;
 	}
 
-	glClearColor(0.1f, 0.2f, 0.5f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	SDL_GL_SwapWindow(window);
-
 	// TODO: Better event handling mechanism.
 	// TODO: Create a window and game logic class?
 	while (SDL_WaitEvent(&event)) {
@@ -70,7 +78,6 @@ main(int argc, char *argv[])
 		}
 		case SDL_WINDOWEVENT: {
 			switch (event.window.event) {
-
 			}
 			break;
 		}
