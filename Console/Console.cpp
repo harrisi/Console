@@ -41,9 +41,12 @@ int
 main(int argc, char *argv[])
 {
 	// TODO: Create instructions for building dependencies on Windows.
+	//   Currently, binaries are copied from build directory into the submodule directory.
+	//   Find a way to automatically build dependencies.
 	// TODO: Put FreeType code in a class.
 	FT_Library library;
 	FT_Face face;
+	FT_UInt index;
 
 	if (FT_Init_FreeType(&library)) {
 		cout << "FT_Init_Library" << std::endl;
@@ -54,6 +57,32 @@ main(int argc, char *argv[])
 		cout << "FT_New_Face" << std::endl;
 		return -1;
 	}
+
+	// TODO: Make this compatible with HiDPI screens.
+	//   Get DPI from SDL, calculate character height/width in 1/64ths of a point.
+	//   Horizontal and vertical DPI is last two arguments.
+	if (FT_Set_Char_Size(face, 0, 16 * 64, 300, 300)) {
+		cout << "FT_Set_Char_Size" << std::endl;
+		return -1;
+	}
+
+	// TODO: Keep in mind proper unicode processing when obtaining values to
+	// pass to this function.
+	// TODO: How to handle failed glyph lookups at runtime?
+	index = FT_Get_Char_Index(face, (FT_ULong)'a');
+	if (FT_Load_Glyph(face, index, FT_LOAD_DEFAULT)) {
+		cout << "FT_Load_Glyph" << std::endl;
+		return -1;
+	}
+
+	// TODO: Allow selection of render mode.
+	//   FT_RENDER_MODE_NORMAL for antialiasing.
+	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_MONO)) {
+		cout << "FT_Render_Glyph" << std::endl;
+		return -1;
+	}
+
+	// TODO: Copy glyph bitmap into texture.
 
 	// TODO: Titleless window.
 	// TODO: Hotkeys for movement - window click and drag, etc.
