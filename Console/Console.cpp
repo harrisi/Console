@@ -7,6 +7,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <ft2build.h>
+#include FT_FREETYPE_H
 
 using namespace std;
 
@@ -39,6 +40,21 @@ render(SDL_Window *window)
 int
 main(int argc, char *argv[])
 {
+	// TODO: Create instructions for building dependencies on Windows.
+	// TODO: Put FreeType code in a class.
+	FT_Library library;
+	FT_Face face;
+
+	if (FT_Init_FreeType(&library)) {
+		cout << "FT_Init_Library" << std::endl;
+		return -1;
+	}
+
+	if (FT_New_Face(library, "C:\\Windows\\Fonts\\consola.ttf", 0, &face)) {
+		cout << "FT_New_Face" << std::endl;
+		return -1;
+	}
+
 	// TODO: Titleless window.
 	// TODO: Hotkeys for movement - window click and drag, etc.
 	SDL_Window *window;
@@ -82,8 +98,6 @@ main(int argc, char *argv[])
 			break;
 		}
 		case SDL_WINDOWEVENT: {
-			switch (event.window.event) {
-			}
 			break;
 		}
 		case SDL_KEYDOWN: {
@@ -100,4 +114,6 @@ main(int argc, char *argv[])
 		}
 		}
 	}
+
+	return 0;
 }
