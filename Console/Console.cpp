@@ -39,6 +39,8 @@ render(SDL_Window *window)
 int
 main(int argc, char *argv[])
 {
+	// TODO: Titleless window.
+	// TODO: Hotkeys for movement - window click and drag, etc.
 	SDL_Window *window;
 	SDL_GLContext context;
 	SDL_Event event;
@@ -72,8 +74,11 @@ main(int argc, char *argv[])
 	// TODO: Better event handling mechanism.
 	// TODO: Create a window and game logic class?
 	while (SDL_WaitEvent(&event)) {
+		render(window);
+
 		switch (event.type) {
 		case SDL_QUIT: {
+			SDL_Quit();
 			break;
 		}
 		case SDL_WINDOWEVENT: {
@@ -85,7 +90,6 @@ main(int argc, char *argv[])
 			if (event.key.repeat)
 				continue;
 
-			cout << event.key.keysym.sym << std::endl;
 			switch (event.key.keysym.sym) {
 			case SDLK_ESCAPE: {
 				SDL_Quit();
