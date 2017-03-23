@@ -29,11 +29,27 @@ glyph::from_string(string codepoint)
 
 }
 
+// TODO: Encapsulate in a class.
+GLuint width, height;
+GLuint texture;
+
 void
 render(SDL_Window *window)
 {
 	glClearColor(0.1f, 0.2f, 0.5f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	// TODO: Use OpenGL 4.0 vector buffer objects and vertex array objects.
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glBegin(GL_QUADS);
+	
+	glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 0.0f);
+	glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 1.0f);
+	glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f);
+	glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, 0.0f);
+	
+	glEnd();
+
 	SDL_GL_SwapWindow(window);
 }
 
@@ -48,6 +64,46 @@ main(int argc, char *argv[])
 	FT_Face face;
 	FT_UInt index;
 
+	// TODO: Titleless window.
+	// TODO: Hotkeys for movement - window click and drag, etc.
+	SDL_Window *window;
+	SDL_GLContext context;
+	SDL_Event event;
+
+#pragma region SDL2
+	if (SDL_Init(SDL_INIT_VIDEO))
+		return -1;
+
+	// TODO: Use OpenGL 4 features only.
+	// TODO: Better error handling.
+	window = SDL_CreateWindow("Console", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
+	if (!window) {
+		SDL_Quit();
+		return -1;
+	}
+
+	// TODO: Find proper event for window drawing.
+	//   It is possible that it will only be necessary
+	// to draw when information on the screen is updated
+	// as there is no physics loop.
+	if (!SDL_GL_SetSwapInterval(1)) {
+		SDL_Quit();
+		return -1;
+	}
+
+	context = SDL_GL_CreateContext(window);
+	if (!context) {
+		SDL_Quit();
+		return -1;
+	}
+
+	const GLubyte* renderer = glGetString(GL_RENDERER);
+	const GLubyte* version = glGetString(GL_VERSION);
+	printf("Renderer: %s\n", renderer);
+	printf("Version: %s\n", version);
+#pragma endregion
+
+#pragma region FreeType2
 	if (FT_Init_FreeType(&library)) {
 		cout << "FT_Init_Library" << std::endl;
 		return -1;
@@ -83,39 +139,16 @@ main(int argc, char *argv[])
 	}
 
 	// TODO: Copy glyph bitmap into texture.
+	// TODO: Proper width and height, aligned to power of 2.
+	width = face->glyph->advance.x >> 6;
+	height = face->glyph->advance.y >> 6;
 
-	// TODO: Titleless window.
-	// TODO: Hotkeys for movement - window click and drag, etc.
-	SDL_Window *window;
-	SDL_GLContext context;
-	SDL_Event event;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
+#pragma endregion FreeType2
 
-	if (SDL_Init(SDL_INIT_VIDEO))
-		return -1;
-
-	// TODO: Use OpenGL 4 features only.
-	// TODO: Better error handling.
-	window = SDL_CreateWindow("Console", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
-	if (!window) {
-		SDL_Quit();
-		return -1;
-	}
-
-	// TODO: Find proper event for window drawing.
-	//   It is possible that it will only be necessary
-	// to draw when information on the screen is updated
-	// as there is no physics loop.
-	if (!SDL_GL_SetSwapInterval(1)) {
-		SDL_Quit();
-		return -1;
-	}
-
-	context = SDL_GL_CreateContext(window);
-	if (!context) {
-		SDL_Quit();
-		return -1;
-	}
-
+#pragma region EventLoop
 	// TODO: Better event handling mechanism.
 	// TODO: Create a window and game logic class?
 	while (SDL_WaitEvent(&event)) {
@@ -143,6 +176,7 @@ main(int argc, char *argv[])
 		}
 		}
 	}
+#pragma endregion
 
 	return 0;
 }
