@@ -134,7 +134,8 @@ main(int argc, char *argv[])
 
 	// TODO: Allow selection of render mode.
 	//   FT_RENDER_MODE_NORMAL for antialiasing.
-	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_MONO)) {
+	//   FT_REDNER_MODE_MONO for monochromatic.
+	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL)) {
 		cout << "FT_Render_Glyph" << std::endl;
 		return -1;
 	}
@@ -150,14 +151,17 @@ main(int argc, char *argv[])
 	// TODO: Find a way to use the data in-place.
 	GLubyte *bitmap = new GLubyte[2 * width * height];
 	for (int i = 0; i < height; i++)
-		for (int j = 0; j < width; j++)
+		for (int j = 0; j < width; j++) {
 			bitmap[2 * (i + j * width)] = bitmap[2 * (i + (j * width) + 1)] =
 				(i >= height || j >= width) ? 0 : face->glyph->bitmap.buffer[i + width * j];
+			cout << (int)face->glyph->bitmap.buffer[i + width * j] << std::endl;
+		}
 	delete[] bitmap;
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, bitmap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, bitmap);
 #pragma endregion FreeType2
 
 #pragma region EventLoop
