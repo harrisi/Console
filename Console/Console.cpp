@@ -41,6 +41,7 @@ render(SDL_Window *window)
 
 	// TODO: Use OpenGL 4.0 vector buffer objects and vertex array objects.
 	glBindTexture(GL_TEXTURE_2D, texture);
+	//glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
 	glBegin(GL_QUADS);
 	
 	glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 0.0f);
@@ -140,12 +141,23 @@ main(int argc, char *argv[])
 
 	// TODO: Copy glyph bitmap into texture.
 	// TODO: Proper width and height, aligned to power of 2.
-	width = face->glyph->advance.x >> 6;
-	height = face->glyph->advance.y >> 6;
+	width = face->glyph->bitmap.width;
+	height = face->glyph->bitmap.rows;
+
+	cout << "Width: " << face->glyph->bitmap.width << std::endl;
+	cout << "Height: " << face->glyph->bitmap.rows << std::endl;
+
+	// TODO: Find a way to use the data in-place.
+	GLubyte *bitmap = new GLubyte[2 * width * height];
+	for (int i = 0; i < height; i++)
+		for (int j = 0; j < width; j++)
+			bitmap[2 * (i + j * width)] = bitmap[2 * (i + (j * width) + 1)] =
+				(i >= height || j >= width) ? 0 : face->glyph->bitmap.buffer[i + width * j];
+	delete[] bitmap;
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, bitmap);
 #pragma endregion FreeType2
 
 #pragma region EventLoop
