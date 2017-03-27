@@ -75,7 +75,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>..\freetype2\Debug;..\SDL2-2.0.5\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\freetype2-bin\Debug;..\SDL2-2.0.5-bin\Debug;$(LibraryPath)</LibraryPath>
     <IncludePath>..\freetype2\include;..\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

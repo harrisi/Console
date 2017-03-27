@@ -1,0 +1,6 @@
+C:/Users/Sid/Documents/Code/Console/freetype2-bin/CMakeFiles/dist.dir
+C:/Users/Sid/Documents/Code/Console/freetype2-bin/CMakeFiles/freetype.dir
+C:/Users/Sid/Documents/Code/Console/freetype2-bin/CMakeFiles/PACKAGE.dir
+C:/Users/Sid/Documents/Code/Console/freetype2-bin/CMakeFiles/INSTALL.dir
+C:/Users/Sid/Documents/Code/Console/freetype2-bin/CMakeFiles/ALL_BUILD.dir
+C:/Users/Sid/Documents/Code/Console/freetype2-bin/CMakeFiles/ZERO_CHECK.dir
