@@ -1,7 +1,0 @@
-C:/Users/Sid/Documents/Code/Console/SDL2-2.0.5-bin/CMakeFiles/INSTALL.dir
-C:/Users/Sid/Documents/Code/Console/SDL2-2.0.5-bin/CMakeFiles/SDL2main.dir
-C:/Users/Sid/Documents/Code/Console/SDL2-2.0.5-bin/CMakeFiles/SDL2.dir
-C:/Users/Sid/Documents/Code/Console/SDL2-2.0.5-bin/CMakeFiles/SDL2-static.dir
-C:/Users/Sid/Documents/Code/Console/SDL2-2.0.5-bin/CMakeFiles/uninstall.dir
-C:/Users/Sid/Documents/Code/Console/SDL2-2.0.5-bin/CMakeFiles/ALL_BUILD.dir
-C:/Users/Sid/Documents/Code/Console/SDL2-2.0.5-bin/CMakeFiles/ZERO_CHECK.dir
