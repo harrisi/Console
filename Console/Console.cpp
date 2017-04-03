@@ -41,7 +41,7 @@ render(SDL_Window *window)
 
 	// TODO: Use OpenGL 4.0 vector buffer objects and vertex array objects.
 	glBindTexture(GL_TEXTURE_2D, texture);
-	//glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
+	glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
 	glBegin(GL_QUADS);
 	
 	glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 0.0f);
