@@ -173,22 +173,25 @@ main(int argc, char *argv[])
 	cout << "Width: " << face->glyph->bitmap.width << ", " << width << std::endl;
 	cout << "Height: " << face->glyph->bitmap.rows << ", " << height << std::endl;
 
-	GLubyte *bitmap = new GLubyte[width * height * 2];
+	GLubyte *bitmap = new GLubyte[width * height];
+	memset(bitmap, 0, width * height);
 
-	// Texture should appear as a black square.
-	for (int i = 0; i < width * height * 2; i++)
-		bitmap[i] = 0x00;
+	for (int i = 0; i < face->glyph->bitmap.width; i++)
+		for (int j = 0; j < face->glyph->bitmap.rows; j++)
+			bitmap[i + j * face->glyph->bitmap.rows] = face->glyph->bitmap.buffer[i + j * face->glyph->bitmap.rows];
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	// Copy data to the texture.
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, bitmap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
 
 	// Set texture parameters to counteract SDL defaults that would cause the texture to not display
 	// after being computed by or with e.g. an invalid mipmap.
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 #pragma endregion FreeType2
 
 #pragma region EventLoop
