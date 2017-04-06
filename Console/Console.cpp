@@ -176,6 +176,7 @@ main(int argc, char *argv[])
 	GLubyte *bitmap = new GLubyte[width * height];
 	memset(bitmap, 0, width * height);
 
+	// TODO: Add alpha channel.
 	for (int i = 0; i < face->glyph->bitmap.width; i++)
 		for (int j = 0; j < face->glyph->bitmap.rows; j++)
 			bitmap[i + j * face->glyph->bitmap.rows] = face->glyph->bitmap.buffer[i + j * face->glyph->bitmap.rows];
