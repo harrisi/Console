@@ -171,7 +171,7 @@ main(int argc, char *argv[])
 	// TODO: Allow selection of render mode.
 	//   FT_RENDER_MODE_NORMAL for antialiasing.
 	//   FT_REDNER_MODE_MONO for monochromatic.
-	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_MONO)) {
+	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL)) {
 		cout << "FT_Render_Glyph" << std::endl;
 		return -1;
 	}
