@@ -65,7 +65,6 @@ render(SDL_Window *window)
 
 	// TODO: Use OpenGL 4.0 vector buffer objects and vertex array objects.
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glColor4f(0.0f, 0.0f, 0.0f, 0.0f);
 	glBegin(GL_QUADS);
 	
 	glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 0.0f);
@@ -159,7 +158,7 @@ main(int argc, char *argv[])
 	// TODO: Allow selection of render mode.
 	//   FT_RENDER_MODE_NORMAL for antialiasing.
 	//   FT_REDNER_MODE_MONO for monochromatic.
-	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL)) {
+	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_MONO)) {
 		cout << "FT_Render_Glyph" << std::endl;
 		return -1;
 	}
@@ -170,14 +169,22 @@ main(int argc, char *argv[])
 	cout << "Width: " << face->glyph->bitmap.width << ", " << width << std::endl;
 	cout << "Height: " << face->glyph->bitmap.rows << ", " << height << std::endl;
 
-	GLubyte *bitmap = new GLubyte[width * height];
+	GLubyte *bitmap = new GLubyte[width * height * 3];
 
-	for (int i = 0; i < width * height; i++)
-		bitmap[i] = 0xFF;
+	// Texture should appear as a black square.
+	for (int i = 0; i < width * height * 3; i++)
+		bitmap[i] = 0x00;
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, bitmap);
+
+	// Copy data to the texture.
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, bitmap);
+
+	// Set texture parameters to counteract SDL defaults that would cause the texture to not display
+	// after being combined with e.g. an invalid mipmap.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 #pragma endregion FreeType2
 
 #pragma region EventLoop
