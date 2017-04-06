@@ -29,6 +29,7 @@ glyph::from_string(string codepoint)
 
 }
 
+// TODO: Find a more compact and faster implementation.
 #define __LOG2A(s) ((s &0xffffffff00000000) ? (32 +__LOG2B(s >>32)): (__LOG2B(s)))
 #define __LOG2B(s) ((s &0xffff0000)         ? (16 +__LOG2C(s >>16)): (__LOG2C(s)))
 #define __LOG2C(s) ((s &0xff00)             ? (8  +__LOG2D(s >>8)) : (__LOG2D(s)))
@@ -163,7 +164,7 @@ main(int argc, char *argv[])
 	// TODO: Allow selection of render mode.
 	//   FT_RENDER_MODE_NORMAL for antialiasing.
 	//   FT_REDNER_MODE_MONO for monochromatic.
-	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_MONO)) {
+	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL)) {
 		cout << "FT_Render_Glyph" << std::endl;
 		return -1;
 	}
@@ -195,8 +196,8 @@ main(int argc, char *argv[])
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// TODO: Look at other values - resizing is potentially more desireable.
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 #pragma endregion FreeType2
 
 #pragma region EventLoop
