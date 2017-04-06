@@ -54,6 +54,10 @@ next_pow2(uint64_t i)
 #endif
 }
 
+// TODO: Enapsulate window and/or window configuration in a class.
+#define WINDOW_WIDTH	640
+#define WINDOW_HEIGHT	480
+
 // TODO: Encapsulate in a class.
 GLuint width, height;
 GLuint texture;
@@ -68,6 +72,9 @@ render(SDL_Window *window)
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
 	
+	float w = 2.0f / WINDOW_WIDTH * width,
+		  h = 2.0f / WINDOW_HEIGHT * height;
+
 	// TODO: Properly scale texture.
 	glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 0.0f);
 	glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 1.0f);
@@ -103,7 +110,7 @@ main(int argc, char *argv[])
 
 	// TODO: Use OpenGL 4 features only.
 	// TODO: Better error handling.
-	window = SDL_CreateWindow("Console", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Console", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
 	if (!window) {
 		SDL_Quit();
 		return -1;
@@ -164,7 +171,7 @@ main(int argc, char *argv[])
 	// TODO: Allow selection of render mode.
 	//   FT_RENDER_MODE_NORMAL for antialiasing.
 	//   FT_REDNER_MODE_MONO for monochromatic.
-	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL)) {
+	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_MONO)) {
 		cout << "FT_Render_Glyph" << std::endl;
 		return -1;
 	}
@@ -186,18 +193,15 @@ main(int argc, char *argv[])
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-
 	// Copy data to the texture.
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, bitmap);
-
 	// Set texture parameters to counteract SDL defaults that would cause the texture to not display
 	// after being computed by or with e.g. an invalid mipmap.
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
-	// TODO: Look at other values - resizing is potentially more desireable.
-	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	delete[] bitmap;
 #pragma endregion FreeType2
 
 #pragma region EventLoop
