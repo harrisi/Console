@@ -73,6 +73,7 @@ render(SDL_Window *window)
 	glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, 0.0f);
 	
 	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	SDL_GL_SwapWindow(window);
 }
@@ -125,6 +126,9 @@ main(int argc, char *argv[])
 	const GLubyte* version = glGetString(GL_VERSION);
 	printf("Renderer: %s\n", renderer);
 	printf("Version: %s\n", version);
+
+	// Necessary to use textures.
+	glEnable(GL_TEXTURE_2D);
 #pragma endregion
 
 #pragma region FreeType2
@@ -169,20 +173,20 @@ main(int argc, char *argv[])
 	cout << "Width: " << face->glyph->bitmap.width << ", " << width << std::endl;
 	cout << "Height: " << face->glyph->bitmap.rows << ", " << height << std::endl;
 
-	GLubyte *bitmap = new GLubyte[width * height * 3];
+	GLubyte *bitmap = new GLubyte[width * height * 2];
 
 	// Texture should appear as a black square.
-	for (int i = 0; i < width * height * 3; i++)
+	for (int i = 0; i < width * height * 2; i++)
 		bitmap[i] = 0x00;
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	// Copy data to the texture.
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, bitmap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, bitmap);
 
 	// Set texture parameters to counteract SDL defaults that would cause the texture to not display
-	// after being combined with e.g. an invalid mipmap.
+	// after being computed by or with e.g. an invalid mipmap.
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 #pragma endregion FreeType2
