@@ -170,9 +170,14 @@ main(int argc, char *argv[])
 	cout << "Width: " << face->glyph->bitmap.width << ", " << width << std::endl;
 	cout << "Height: " << face->glyph->bitmap.rows << ", " << height << std::endl;
 
+	GLubyte *bitmap = new GLubyte[width * height];
+
+	for (int i = 0; i < width * height; i++)
+		bitmap[i] = 0xFF;
+
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, bitmap);
 #pragma endregion FreeType2
 
 #pragma region EventLoop
