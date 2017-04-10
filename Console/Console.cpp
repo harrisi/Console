@@ -52,9 +52,9 @@ render(SDL_Window *window)
 
 	// TODO: Properly scale texture.
 	glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 0.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 1.0f);
-	glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, 1.0f);
-	glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 0.0f);
+	glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, h);
+	glTexCoord2f(1.0f, 0.0f); glVertex2f(w, h);
+	glTexCoord2f(1.0f, 1.0f); glVertex2f(w, 0.0f);
 	
 	glEnd();
 	glBindTexture(GL_TEXTURE_2D, 0);
