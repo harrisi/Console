@@ -107,11 +107,14 @@ main(int argc, char *argv[])
 
 	const GLubyte* renderer = glGetString(GL_RENDERER);
 	const GLubyte* version = glGetString(GL_VERSION);
-	printf("Renderer: %s\n", renderer);
-	printf("Version: %s\n", version);
+	cout << "Renderer: " << renderer << std::endl;
+	cout << "Version: " << version << std::endl;
 
 	// Necessary to use textures.
 	glEnable(GL_TEXTURE_2D);
+	// Enable alpha blending.
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 #pragma endregion
 
 #pragma region FreeType2
@@ -128,7 +131,8 @@ main(int argc, char *argv[])
 
 	// TODO: Support multiple monitors and/or monitors with disparate metrics.
 	//   SDL seems to have some transparent support for HiDPI displays, figure
-	//   out how to use it if possible.
+	//   out how to use it if possible. How to handle the case where the window
+	//   spans multiple monitors?
 	if ((displays = SDL_GetNumVideoDisplays()) < 0) {
 		cout << "SDL_GetNumVideoDisplays" << std::endl;
 		return -1;
@@ -137,10 +141,6 @@ main(int argc, char *argv[])
 		cout << "SDL_GetDisplayDPI" << std::endl;
 		return -1;
 	}
-
-	// TODO: Make this compatible with HiDPI screens.
-	//   Get DPI from SDL, calculate character height/width in 1/64ths of a point.
-	//   Horizontal and vertical DPI is last two arguments.
 	if (FT_Set_Char_Size(face, 0, 100 * 64, hdpi, vdpi)) {
 		cout << "FT_Set_Char_Size" << std::endl;
 		return -1;
@@ -166,14 +166,10 @@ main(int argc, char *argv[])
 
 	width = face->glyph->bitmap.width;
 	height = face->glyph->bitmap.rows;
-
-	cout << "Width: " << face->glyph->bitmap.width << ", " << width << std::endl;
-	cout << "Height: " << face->glyph->bitmap.rows << ", " << height << std::endl;
-
+	
 	GLubyte *bitmap = new GLubyte[width * height * 2];
 	memset(bitmap, 0, width * height * 2);
 
-	// TODO: Figure out why glyph is drawn with a black background.
 	for (int i = 0; i < width; i++)
 		for (int j = 0; j < height; j++)
 			bitmap[2 * (i + j * width)] = bitmap[2 * (i + j * width) + 1] = 
