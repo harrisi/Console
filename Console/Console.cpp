@@ -50,7 +50,6 @@ render(SDL_Window *window)
 	float w = 2.0f / WINDOW_WIDTH * width,
 		  h = 2.0f / WINDOW_HEIGHT * height;
 
-	// TODO: Properly scale texture.
 	glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 0.0f);
 	glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, h);
 	glTexCoord2f(1.0f, 0.0f); glVertex2f(w, h);
