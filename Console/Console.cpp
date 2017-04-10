@@ -64,9 +64,7 @@ render(SDL_Window *window)
 int
 main(int argc, char *argv[])
 {
-	// TODO: Create instructions for building dependencies on Windows.
-	//   Currently, binaries are copied from build directory into the submodule directory.
-	//   Find a way to automatically build dependencies.
+	// TODO: Better error handling.
 	// TODO: Put FreeType code in a class.
 	FT_Library library;
 	FT_Face face;
@@ -77,6 +75,8 @@ main(int argc, char *argv[])
 	SDL_Window *window;
 	SDL_GLContext context;
 	SDL_Event event;
+	int displays;
+	float ddpi, vdpi, hdpi;
 
 #pragma region SDL2
 	if (SDL_Init(SDL_INIT_VIDEO))
@@ -120,15 +120,28 @@ main(int argc, char *argv[])
 		return -1;
 	}
 
+	// TODO: Find a cross-platform way to specify fonts.
 	if (FT_New_Face(library, "C:\\Windows\\Fonts\\consola.ttf", 0, &face)) {
 		cout << "FT_New_Face" << std::endl;
+		return -1;
+	}
+
+	// TODO: Support multiple monitors and/or monitors with disparate metrics.
+	//   SDL seems to have some transparent support for HiDPI displays, figure
+	//   out how to use it if possible.
+	if ((displays = SDL_GetNumVideoDisplays()) < 0) {
+		cout << "SDL_GetNumVideoDisplays" << std::endl;
+		return -1;
+	}
+	if (SDL_GetDisplayDPI(0, &ddpi, &hdpi, &vdpi)) {
+		cout << "SDL_GetDisplayDPI" << std::endl;
 		return -1;
 	}
 
 	// TODO: Make this compatible with HiDPI screens.
 	//   Get DPI from SDL, calculate character height/width in 1/64ths of a point.
 	//   Horizontal and vertical DPI is last two arguments.
-	if (FT_Set_Char_Size(face, 0, 16 * 64, 300, 300)) {
+	if (FT_Set_Char_Size(face, 0, 100 * 64, hdpi, vdpi)) {
 		cout << "FT_Set_Char_Size" << std::endl;
 		return -1;
 	}
@@ -160,11 +173,11 @@ main(int argc, char *argv[])
 	GLubyte *bitmap = new GLubyte[width * height * 2];
 	memset(bitmap, 0, width * height * 2);
 
-	// TODO: Fix image format.
+	// TODO: Figure out why glyph is drawn with a black background.
 	for (int i = 0; i < width; i++)
 		for (int j = 0; j < height; j++)
 			bitmap[2 * (i + j * width)] = bitmap[2 * (i + j * width) + 1] = 
-				(i >= width || j >= height) ? 0 : face->glyph->bitmap.buffer[i + j * width];
+				face->glyph->bitmap.buffer[i + j * width];
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
