@@ -84,7 +84,10 @@ main(int argc, char *argv[])
 
 	// TODO: Use OpenGL 4 features only.
 	// TODO: Better error handling.
-	window = SDL_CreateWindow("Console", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Console",
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		WINDOW_WIDTH, WINDOW_HEIGHT,
+		SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL);
 	if (!window) {
 		SDL_Quit();
 		return -1;
