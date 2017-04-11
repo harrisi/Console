@@ -21,12 +21,47 @@ class glyph {
 public:
 	GLuint width, height;
 	GLuint texture;
-	glyph(FT_Library library, FT_Face face, FT_ULong codepoint);
+	glyph(FT_Face face, FT_ULong codepoint);
 };
 
-glyph::glyph(FT_Library library, FT_Face face, FT_ULong codepoint)
+// TODO: Prerendering of font cache.
+// TODO: Multithreaded rendering if necessary.
+glyph::glyph(FT_Face face, FT_ULong codepoint)
 {
+	FT_UInt index = FT_Get_Char_Index(face, codepoint);
+	if (FT_Load_Glyph(face, index, FT_LOAD_DEFAULT))
+		throw exception("FT_Load_Glyph");
+	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL))
+		throw exception("FT_Render_Glyph");
 
+	width = face->glyph->bitmap.width;
+	height = face->glyph->bitmap.rows;
+
+	GLubyte *bitmap = new GLubyte[width * height * 2];
+	memset(bitmap, 0, width * height * 2);
+
+	for (int i = 0; i < width; i++)
+		for (int j = 0; j < height; j++)
+			bitmap[2 * (i + j * width)] = bitmap[2 * (i + j * width) + 1] =
+				face->glyph->bitmap.buffer[i + j * width];
+
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	// Remove requirement for a power of two sized texture?
+	// TODO: Experiment with values. This does not seem to do what it claims at face value,
+	// as other settings are permissible despite not making sense. On an AMD W7100 values
+	// passed here seem to persist across invocations of the program.
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	// Copy data to the texture.
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, bitmap);
+	// Set texture parameters to counteract SDL defaults that would cause the texture to not display
+	// after being computed by or with e.g. an invalid mipmap.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	delete[] bitmap;
 }
 
 // TODO: Encapsulate in a class.
@@ -145,52 +180,10 @@ main(int argc, char *argv[])
 		return -1;
 	}
 
-	// TODO: Keep in mind proper unicode processing when obtaining values to
-	// pass to this function.
-	// TODO: How to handle failed glyph lookups at runtime?
-	index = FT_Get_Char_Index(face, (FT_ULong)'a');
-	if (FT_Load_Glyph(face, index, FT_LOAD_DEFAULT)) {
-		cout << "FT_Load_Glyph" << std::endl;
-		return -1;
-	}
-
-	// TODO: Allow selection of render mode.
-	//   FT_RENDER_MODE_NORMAL for antialiasing.
-	//   FT_REDNER_MODE_MONO for monochromatic.
-	// TODO: Properly render a glyph using FT_RENDER_MODE_MONO.
-	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL)) {
-		cout << "FT_Render_Glyph" << std::endl;
-		return -1;
-	}
-
-	width = face->glyph->bitmap.width;
-	height = face->glyph->bitmap.rows;
-	
-	GLubyte *bitmap = new GLubyte[width * height * 2];
-	memset(bitmap, 0, width * height * 2);
-
-	for (int i = 0; i < width; i++)
-		for (int j = 0; j < height; j++)
-			bitmap[2 * (i + j * width)] = bitmap[2 * (i + j * width) + 1] = 
-				face->glyph->bitmap.buffer[i + j * width];
-
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	// Remove requirement for a power of two sized texture?
-	// TODO: Experiment with values. This does not seem to do what it claims at face value,
-	// as other settings are permissible despite not making sense. On an AMD W7100 values
-	// passed here seem to persist across invocations of the program.
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	// Copy data to the texture.
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, bitmap);
-	// Set texture parameters to counteract SDL defaults that would cause the texture to not display
-	// after being computed by or with e.g. an invalid mipmap.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	delete[] bitmap;
+	glyph a = glyph(face, (FT_ULong)'a');
+	width = a.width;
+	height = a.height;
+	texture = a.texture;
 #pragma endregion FreeType2
 
 #pragma region EventLoop
