@@ -11,27 +11,23 @@
 
 using namespace std;
 
-class glyph {
-public:
-	int texture_id;
-	glyph();
-	void from_string(string codepoint);
-};
-
-glyph::glyph()
-{
-
-}
-
-void
-glyph::from_string(string codepoint)
-{
-
-}
-
 // TODO: Enapsulate window and/or window configuration in a class.
 #define WINDOW_WIDTH	640
 #define WINDOW_HEIGHT	480
+
+// TODO: Determine if there is a better way to encapsulate the FreeType
+// classes.
+class glyph {
+public:
+	GLuint width, height;
+	GLuint texture;
+	glyph(FT_Library library, FT_Face face, FT_ULong codepoint);
+};
+
+glyph::glyph(FT_Library library, FT_Face face, FT_ULong codepoint)
+{
+
+}
 
 // TODO: Encapsulate in a class.
 GLuint width, height;
