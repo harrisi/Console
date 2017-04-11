@@ -17,12 +17,20 @@ using namespace std;
 
 // TODO: Determine if there is a better way to encapsulate the FreeType
 // classes.
+// TODO: Compile a display list and use vertex buffer objects.
 class glyph {
 public:
 	GLuint width, height;
 	GLuint texture;
+	glyph();
 	glyph(FT_Face face, FT_ULong codepoint);
+	void render(float x, float y);
 };
+
+glyph::glyph()
+{
+
+}
 
 // TODO: Prerendering of font cache.
 // TODO: Multithreaded rendering if necessary.
@@ -37,6 +45,7 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	width = face->glyph->bitmap.width;
 	height = face->glyph->bitmap.rows;
 
+	// TODO: Determine if it's possible to only supply an alpha channel.
 	GLubyte *bitmap = new GLubyte[width * height * 2];
 	memset(bitmap, 0, width * height * 2);
 
@@ -64,9 +73,32 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	delete[] bitmap;
 }
 
+void
+glyph::render(float x, float y)
+{
+	if (!texture)
+		throw exception("Attempt to draw unintitialized glyph.");
+
+	// TODO: Use OpenGL 4.0 vector buffer objects and vertex array objects.
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glBegin(GL_QUADS);
+
+	float w = 2.0f / WINDOW_WIDTH * width,
+		  h = 2.0f / WINDOW_HEIGHT * height;
+
+	glTexCoord2f(0.0f, 1.0f); glVertex2f(x + 0, y + 0);
+	glTexCoord2f(0.0f, 0.0f); glVertex2f(x + 0, y + h);
+	glTexCoord2f(1.0f, 0.0f); glVertex2f(x + w, y + h);
+	glTexCoord2f(1.0f, 1.0f); glVertex2f(x + w, y + 0);
+
+	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 // TODO: Encapsulate in a class.
 GLuint width, height;
 GLuint texture;
+glyph a, current;
 
 void
 render(SDL_Window *window)
@@ -74,20 +106,12 @@ render(SDL_Window *window)
 	glClearColor(0.1f, 0.2f, 0.5f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	// TODO: Use OpenGL 4.0 vector buffer objects and vertex array objects.
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glBegin(GL_QUADS);
-	
-	float w = 2.0f / WINDOW_WIDTH * width,
-		  h = 2.0f / WINDOW_HEIGHT * height;
+	// TODO: Draw taking into account font metrics.
+	float w = 2.0f / WINDOW_WIDTH * a.width,
+		  h = 2.0f / WINDOW_HEIGHT * a.height;
 
-	glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 0.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, h);
-	glTexCoord2f(1.0f, 0.0f); glVertex2f(w, h);
-	glTexCoord2f(1.0f, 1.0f); glVertex2f(w, 0.0f);
-	
-	glEnd();
-	glBindTexture(GL_TEXTURE_2D, 0);
+	a.render(0.0f, 0.0f);
+	current.render(0.0f + w, 0.0f);
 
 	SDL_GL_SwapWindow(window);
 }
@@ -138,7 +162,7 @@ main(int argc, char *argv[])
 		SDL_Quit();
 		return -1;
 	}
-
+	
 	const GLubyte* renderer = glGetString(GL_RENDERER);
 	const GLubyte* version = glGetString(GL_VERSION);
 	cout << "Renderer: " << renderer << std::endl;
@@ -179,14 +203,14 @@ main(int argc, char *argv[])
 		cout << "FT_Set_Char_Size" << std::endl;
 		return -1;
 	}
-
-	glyph a = glyph(face, (FT_ULong)'a');
-	width = a.width;
-	height = a.height;
-	texture = a.texture;
+	
+	a = glyph(face, (FT_ULong)'a');
+	current = a;
 #pragma endregion FreeType2
 
 #pragma region EventLoop
+	// TODO: Find a cross-platform way to handle unicode input. It seems to
+	// have been removed from SDL around the 1.3 release.
 	// TODO: Better event handling mechanism.
 	// TODO: Create a window and game logic class?
 	while (SDL_WaitEvent(&event)) {
@@ -203,6 +227,8 @@ main(int argc, char *argv[])
 		case SDL_KEYDOWN: {
 			if (event.key.repeat)
 				continue;
+
+			current = glyph(face, (FT_ULong)event.key.keysym.sym);
 
 			switch (event.key.keysym.sym) {
 			case SDLK_ESCAPE: {
