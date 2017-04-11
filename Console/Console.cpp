@@ -39,6 +39,11 @@ glyph::glyph()
 // TODO: Multithreaded rendering if necessary.
 glyph::glyph(FT_Face face, FT_ULong codepoint)
 {
+	// TODO: Allow selection of face and rendering mode.
+	// TODO: Figure out why rendered glyphs appear thin with black backgrounds.
+	//   Drawing the font by passing the rendered bitmap directly to OpenGL as
+	// an alpha channel produces a more appealing glyph, though it is drawn in
+	// black.
 	FT_UInt index = FT_Get_Char_Index(face, codepoint);
 	if (FT_Load_Glyph(face, index, FT_LOAD_DEFAULT))
 		throw exception("FT_Load_Glyph");
@@ -54,6 +59,7 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	advance_y = face->glyph->advance.y;
 
 	// TODO: Determine if it's possible to only supply an alpha channel.
+	//   Supplying only an alpha channel causes the font to be drawn in black.
 	GLubyte *bitmap = new GLubyte[width * height * 2];
 	memset(bitmap, 0, width * height * 2);
 
@@ -70,6 +76,7 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	// Copy data to the texture.
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, bitmap);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
 	// Set texture parameters to counteract SDL defaults that would cause the texture to not display
 	// after being computed by or with e.g. an invalid mipmap.
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -90,6 +97,7 @@ glyph::render(float x, float y)
 	// TODO: Use shaders to provide font coloring.
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 	float w = 2.0f / WINDOW_WIDTH * width,
 		  h = 2.0f / WINDOW_HEIGHT * height;
@@ -195,6 +203,8 @@ main(int argc, char *argv[])
 	}
 
 	// TODO: Find a cross-platform way to specify fonts.
+	// TODO: Get a list of suggested fonts. Consider Consolas, Lucidia Console.
+	//   consola.ttf, lucon.ttf.
 	if (FT_New_Face(library, "C:\\Windows\\Fonts\\consola.ttf", 0, &face)) {
 		cout << "FT_New_Face" << std::endl;
 		return -1;
