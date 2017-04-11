@@ -20,6 +20,9 @@ using namespace std;
 // TODO: Compile a display list and use vertex buffer objects.
 class glyph {
 public:
+	unsigned bearing_x, bearing_y;
+	// TODO: Should internal format of 1/64ths of a point be kept?
+	unsigned advance_x, advance_y;
 	GLuint width, height;
 	GLuint texture;
 	glyph();
@@ -42,8 +45,13 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL))
 		throw exception("FT_Render_Glyph");
 
+	// TODO: Determine the best way to store glyph metrics.
 	width = face->glyph->bitmap.width;
 	height = face->glyph->bitmap.rows;
+	bearing_x = face->glyph->bitmap_left;
+	bearing_y = face->glyph->bitmap_top;
+	advance_x = face->glyph->advance.x;
+	advance_y = face->glyph->advance.y;
 
 	// TODO: Determine if it's possible to only supply an alpha channel.
 	GLubyte *bitmap = new GLubyte[width * height * 2];
@@ -56,10 +64,8 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	// Remove requirement for a power of two sized texture?
-	// TODO: Experiment with values. This does not seem to do what it claims at face value,
-	// as other settings are permissible despite not making sense. On an AMD W7100 values
-	// passed here seem to persist across invocations of the program.
+	// OpenGL requires texture data to be aligned on 4 byte boundaries by
+	// default. This removes that restriction.
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	// Copy data to the texture.
@@ -73,6 +79,7 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	delete[] bitmap;
 }
 
+// TODO: Consider handling font metrics inside this function.
 void
 glyph::render(float x, float y)
 {
@@ -80,6 +87,7 @@ glyph::render(float x, float y)
 		throw exception("Attempt to draw unintitialized glyph.");
 
 	// TODO: Use OpenGL 4.0 vector buffer objects and vertex array objects.
+	// TODO: Use shaders to provide font coloring.
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
 
@@ -107,11 +115,16 @@ render(SDL_Window *window)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// TODO: Draw taking into account font metrics.
-	float w = 2.0f / WINDOW_WIDTH * a.width,
-		  h = 2.0f / WINDOW_HEIGHT * a.height;
+	float x = 0.0f + 2.0f / WINDOW_WIDTH * (current.bearing_x), // bearing x.
+		  y = 0.0f - 2.0f / WINDOW_HEIGHT * (current.height - current.bearing_y); // height - bearing y.
+	float w = 2.0f / WINDOW_WIDTH * (a.advance_x / 64), // this seems to be too far.
+		  h = 2.0f / WINDOW_HEIGHT * (a.advance_y / 64);
+
+	// Origin of 0, 0. Texture origin may be below and to the right of this
+	// point.
 
 	a.render(0.0f, 0.0f);
-	current.render(0.0f + w, 0.0f);
+	current.render(x + w, y);
 
 	SDL_GL_SwapWindow(window);
 }
