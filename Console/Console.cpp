@@ -68,8 +68,8 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	//   Using duplicated information and glBlendEquation set to GL_MAX
 	// produces good results.
 	//   Glyphs still have dark artifacts on some pixels which should be
-	// transparent and letting the black background through. This is
-	// visible in other programs, such as PowerShell and Visual Studio 2017.
+	// transparent and letting the background through. This is visible in other
+	// programs, such as PowerShell and Visual Studio 2017.
 	for (int i = 0; i < width; i++)
 		for (int j = 0; j < height; j++) {
 			bitmap[2 * (i + j * width) + 0] = 0xFF;
