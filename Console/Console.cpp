@@ -6,6 +6,7 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <SDL_opengl_glext.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
@@ -64,6 +65,10 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	// TODO: Remove darkness around edge.
 	//   Treating the glyph bitmap as an alpha channel for a white image
 	// produces a better effect.
+	//   Using duplicated information and glBlendEquation set to GL_MAX
+	// produces good results.
+	//   Glyphs still have dark artifacts on some pixels which should be
+	// transparent and letting the black background through.
 	for (int i = 0; i < width; i++)
 		for (int j = 0; j < height; j++) {
 			bitmap[2 * (i + j * width) + 0] = 0xFF;
@@ -196,6 +201,9 @@ main(int argc, char *argv[])
 	// Enable alpha blending.
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// TODO: Find an extensions loading library or properly load extensions.
+	wglGetProcAddress("wglGetExtensionsStringARB");
+	//((void (*)(int))wglGetProcAddress("glBlendEquation"))(GL_MAX);
 #pragma endregion
 
 #pragma region FreeType2
