@@ -64,9 +64,16 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	memset(bitmap, 0, width * height * 2);
 
 	for (int i = 0; i < width; i++)
+		for (int j = 0; j < height; j++) {
+			bitmap[2 * (i + j * width) + 0] = 0xFF;
+			bitmap[2 * (i + j * width) + 1] = face->glyph->bitmap.buffer[i + j * width];
+		}
+	/*
+	for (int i = 0; i < width; i++)
 		for (int j = 0; j < height; j++)
 			bitmap[2 * (i + j * width)] = bitmap[2 * (i + j * width) + 1] =
 				face->glyph->bitmap.buffer[i + j * width];
+	*/
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -205,7 +212,7 @@ main(int argc, char *argv[])
 	// TODO: Find a cross-platform way to specify fonts.
 	// TODO: Get a list of suggested fonts. Consider Consolas, Lucidia Console.
 	//   consola.ttf, lucon.ttf.
-	if (FT_New_Face(library, "C:\\Windows\\Fonts\\consola.ttf", 0, &face)) {
+	if (FT_New_Face(library, "C:\\Windows\\Fonts\\lucon.ttf", 0, &face)) {
 		cout << "FT_New_Face" << std::endl;
 		return -1;
 	}
@@ -222,7 +229,10 @@ main(int argc, char *argv[])
 		cout << "SDL_GetDisplayDPI" << std::endl;
 		return -1;
 	}
-	if (FT_Set_Char_Size(face, 0, 100 * 64, hdpi, vdpi)) {
+	// TODO: Determine why font looks too thin at small points, e.g. 12. Issue
+	//   may be related to alpha blending. Glyphs appear to be drawn with a
+	//   black border.
+	if (FT_Set_Char_Size(face, 0, 10 * 64, hdpi, vdpi)) {
 		cout << "FT_Set_Char_Size" << std::endl;
 		return -1;
 	}
