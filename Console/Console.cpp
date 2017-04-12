@@ -58,22 +58,17 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	advance_x = face->glyph->advance.x;
 	advance_y = face->glyph->advance.y;
 
-	// TODO: Determine if it's possible to only supply an alpha channel.
-	//   Supplying only an alpha channel causes the font to be drawn in black.
 	GLubyte *bitmap = new GLubyte[width * height * 2];
 	memset(bitmap, 0, width * height * 2);
 
+	// TODO: Remove darkness around edge.
+	//   Treating the glyph bitmap as an alpha channel for a white image
+	// produces a better effect.
 	for (int i = 0; i < width; i++)
 		for (int j = 0; j < height; j++) {
 			bitmap[2 * (i + j * width) + 0] = 0xFF;
 			bitmap[2 * (i + j * width) + 1] = face->glyph->bitmap.buffer[i + j * width];
 		}
-	/*
-	for (int i = 0; i < width; i++)
-		for (int j = 0; j < height; j++)
-			bitmap[2 * (i + j * width)] = bitmap[2 * (i + j * width) + 1] =
-				face->glyph->bitmap.buffer[i + j * width];
-	*/
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -229,9 +224,6 @@ main(int argc, char *argv[])
 		cout << "SDL_GetDisplayDPI" << std::endl;
 		return -1;
 	}
-	// TODO: Determine why font looks too thin at small points, e.g. 12. Issue
-	//   may be related to alpha blending. Glyphs appear to be drawn with a
-	//   black border.
 	if (FT_Set_Char_Size(face, 0, 10 * 64, hdpi, vdpi)) {
 		cout << "FT_Set_Char_Size" << std::endl;
 		return -1;
