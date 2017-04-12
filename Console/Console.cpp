@@ -15,6 +15,8 @@ using namespace std;
 
 // TODO: Enapsulate window and/or window configuration in a class.
 // TODO: Centralize this declaration.
+// TODO: Size window based on selected font size and a number of rows and
+// columns.
 #define WINDOW_WIDTH	640
 #define WINDOW_HEIGHT	480
 
