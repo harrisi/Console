@@ -14,28 +14,12 @@
 using namespace std;
 
 #include "Glyph.h"
+#include "Path.h"
 
 // TODO: Enapsulate window and/or window configuration in a class.
 // TODO: Centralize this declaration.
 #define WINDOW_WIDTH	640
 #define WINDOW_HEIGHT	480
-
-class path {
-public:
-	string codepoints;
-	path();
-	path(string codepoints);
-};
-
-path::path()
-{
-
-}
-
-path::path(string codepoints)
-{
-	this->codepoints = codepoints;
-}
 
 // TODO: Encapsulate in a class.
 GLuint width, height;
