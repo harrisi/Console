@@ -13,6 +13,8 @@
 
 using namespace std;
 
+// TODO: Should the drawing interface instead simply specify a glyph for each
+// row and column position? (Most likely yes.)
 #include "Glyph.h"
 #include "Path.h"
 
