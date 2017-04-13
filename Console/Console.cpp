@@ -1,17 +1,18 @@
 // Console.cpp : Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
 #include <map>
 #include <string>
 #include <iostream>
-#include <SDL.h>
-#include <SDL_opengl.h>
-#include <SDL_opengl_glext.h>
-#include <ft2build.h>
+#include <exception>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_opengl_glext.h>
+#include <freetype2/ft2build.h>
 #include FT_FREETYPE_H
 using namespace std;
 
+// TODO: Handle errors in a portable way.
 
 // TODO: Enapsulate window and/or window configuration in a class.
 // TODO: Centralize this declaration.
@@ -48,10 +49,12 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	// an alpha channel produces a more appealing glyph, though it is drawn in
 	// black.
 	FT_UInt index = FT_Get_Char_Index(face, codepoint);
-	if (FT_Load_Glyph(face, index, FT_LOAD_DEFAULT))
-		throw exception("FT_Load_Glyph");
-	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL))
-		throw exception("FT_Render_Glyph");
+	if (FT_Load_Glyph(face, index, FT_LOAD_DEFAULT)) {
+		//throw exception("FT_Load_Glyph");
+	}
+	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL)) {
+		//throw exception("FT_Render_Glyph");
+	}
 
 	// TODO: Determine the best way to store glyph metrics.
 	width = face->glyph->bitmap.width;
@@ -102,8 +105,9 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 void
 glyph::render(float x, float y)
 {
-	if (!texture)
-		throw exception("Attempt to draw unintitialized glyph.");
+	if (!texture) {
+		//throw exception("Attempt to draw unintitialized glyph.");
+	}
 
 	// TODO: Use OpenGL 4.0 vector buffer objects and vertex array objects.
 	// TODO: Use shaders to provide font coloring.
@@ -170,8 +174,10 @@ main(int argc, char *argv[])
 	float ddpi, vdpi, hdpi;
 
 #pragma region SDL2
-	if (SDL_Init(SDL_INIT_VIDEO))
+	if (SDL_Init(SDL_INIT_VIDEO)) {
+		cout << "SDL_Init" << std::endl;
 		return -1;
+	}
 
 	// TODO: Use OpenGL 4 features only.
 	// TODO: Better error handling.
@@ -180,6 +186,7 @@ main(int argc, char *argv[])
 		WINDOW_WIDTH, WINDOW_HEIGHT,
 		SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL);
 	if (!window) {
+		cout << "SDL_CreateWindow: " << SDL_GetError() << std::endl;
 		SDL_Quit();
 		return -1;
 	}
@@ -189,12 +196,14 @@ main(int argc, char *argv[])
 	// to draw when information on the screen is updated
 	// as there is no physics loop.
 	if (!SDL_GL_SetSwapInterval(1)) {
+		cout << "SDL_GL_SetSwapInterval" << std::endl;
 		SDL_Quit();
 		return -1;
 	}
 
 	context = SDL_GL_CreateContext(window);
 	if (!context) {
+		cout << "SDL_GL_CreateContext" << std::endl;
 		SDL_Quit();
 		return -1;
 	}
@@ -223,7 +232,12 @@ main(int argc, char *argv[])
 	// TODO: Find a cross-platform way to specify fonts.
 	// TODO: Get a list of suggested fonts. Consider Consolas, Lucidia Console.
 	//   consola.ttf, lucon.ttf.
+#ifdef __GNUG__
+	if (FT_New_Face(library,
+		"/usr/share/fonts/ubuntu-font-family/UbuntuMono-R.ttf", 0, &face)) {
+#else
 	if (FT_New_Face(library, "C:\\Windows\\Fonts\\lucon.ttf", 0, &face)) {
+#endif
 		cout << "FT_New_Face" << std::endl;
 		return -1;
 	}
