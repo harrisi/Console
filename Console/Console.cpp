@@ -1,15 +1,27 @@
 // Console.cpp : Defines the entry point for the console application.
 //
 
-#include <map>
-#include <string>
-#include <iostream>
-#include <exception>
+// TODO: Visual Studo 2017/MS C++ does not allow this to be in a conditional
+// preprocessor block.
+#include "stdafx.h"
+
+#ifdef	_GNUG_
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_opengl_glext.h>
 #include <freetype2/ft2build.h>
+#else	/* _GNUG_ */
+#include <SDL.h>
+#include <SDL_opengl.h>
+#include <SDL_opengl_glext.h>
+#include <ft2build.h>
+#endif	/* _GNUG_ */
 #include FT_FREETYPE_H
+
+#include <map>
+#include <string>
+#include <iostream>
+#include <exception>
 using namespace std;
 
 // TODO: Handle errors in a portable way.
