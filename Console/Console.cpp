@@ -227,9 +227,14 @@ main(int argc, char *argv[])
 
 	// Necessary to use textures.
 	glEnable(GL_TEXTURE_2D);
+
+	// TODO: Find a blending mode which eliminates the dark artifacts, as
+	// suggested by a FreeType2 developer.
+	// TODO: Should this be set locally when drawing glyphs?
 	// Enable alpha blending.
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	// TODO: Find an extensions loading library or properly load extensions.
 	//wglGetProcAddress("wglGetExtensionsStringARB");
 	//((void (*)(int))wglGetProcAddress("glBlendEquation"))(GL_MAX);
