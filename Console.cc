@@ -265,6 +265,7 @@ main(int argc, char *argv[])
 	//   spans multiple monitors?
 	// TODO: Program displays at reasonable size on OSX but does not display at
 	//   the correct resolution.
+	// Sometimes the glyph textures will have blending artifacts on OSX.
 	if ((displays = SDL_GetNumVideoDisplays()) < 0) {
 		cout << "SDL_GetNumVideoDisplays" << std::endl;
 		return -1;
