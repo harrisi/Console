@@ -152,7 +152,11 @@ map<string, glyph> book;
 void
 get_font_metrics(FT_Face *face)
 {
-	// face->bbox, smallest box that contains all glyphs in face.
+	// face->bbox: smallest box that contains all glyphs in face.
+	// face->height: value to use for linefeed.
+	// face->max_advance_width: consider for use instead of bbox values.
+	// face->max_advance_height: consider for use instead of bbox or height
+	//   values.
 }
 
 void
