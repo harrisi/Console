@@ -249,10 +249,12 @@ main(int argc, char *argv[])
 	// TODO: Find a cross-platform way to specify fonts.
 	// TODO: Get a list of suggested fonts. Consider Consolas, Lucidia Console.
 	//   consola.ttf, lucon.ttf.
-#ifdef __GNUG__
+#ifdef __APPLE__
+        if (FT_New_Face(library, "/Library/Fonts/Andale Mono.ttf", 0, &face)) {
+#elif defined (__GNUG__)
 	if (FT_New_Face(library,
 		"/usr/share/fonts/ubuntu-font-family/UbuntuMono-R.ttf", 0, &face)) {
-#else
+#else // WINDOWS
 	if (FT_New_Face(library, "C:\\Windows\\Fonts\\lucon.ttf", 0, &face)) {
 #endif
 		cout << "FT_New_Face" << std::endl;
