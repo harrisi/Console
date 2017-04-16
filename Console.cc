@@ -263,6 +263,8 @@ main(int argc, char *argv[])
 	//   SDL seems to have some transparent support for HiDPI displays, figure
 	//   out how to use it if possible. How to handle the case where the window
 	//   spans multiple monitors?
+	// TODO: Program displays at reasonable size on OSX but does not display at
+	//   the correct resolution.
 	if ((displays = SDL_GetNumVideoDisplays()) < 0) {
 		cout << "SDL_GetNumVideoDisplays" << std::endl;
 		return -1;
