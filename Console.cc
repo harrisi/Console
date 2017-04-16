@@ -147,6 +147,14 @@ glyph a, current;
 string initial_glyphs = "abcdefghijklmnopqrstuvwxyz0123456789";
 map<string, glyph> book;
 
+// TODO: Create other functions as appropriate to size the main window based on
+// selected font face.
+void
+get_font_metrics(FT_Face *face)
+{
+	// face->bbox, smallest box that contains all glyphs in face.
+}
+
 void
 render(SDL_Window *window)
 {
