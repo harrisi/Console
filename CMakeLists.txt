@@ -6,9 +6,17 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "./CMake")
 find_package (OpenGL REQUIRED)
 include_directories (${OPENGL_INCLUDE_DIRS})
 
+# The below needs to be fixed for Windows compilation.
+#
+# Define SDL2_INCLUDE_DIRS manually, and point SDL2_LIBRARY to SDL2.lib and
+# SDL2main.lib. The project may need to be edited.
 find_package (SDL2 REQUIRED)
 include_directories (${SDL2_INCLUDE_DIRS})
 
+# The below needs to be fixed for Windows compilation.
+#
+# Define FREETYPE_INCLUDE_DIRS manually, and point FREETYPE_LIBRARIES to
+# freetyped.lib.
 find_package (Freetype REQUIRED)
 include_directories (${FREETYPE_INCLUDE_DIRS})
 
