@@ -5,17 +5,19 @@
 // preprocessor block.
 //#include "stdafx.h"
 
-#ifdef	__GNUG__
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
-#include <SDL2/SDL_opengl_glext.h>
-#include <freetype2/ft2build.h>
-#else	/* __GNUG__ */
+// TODO: Search for better and more exclusive macros. Possibly configure CMake
+// to avoid include location variance.
+#ifdef	__MINGW32__
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
 #include <ft2build.h>
-#endif	/* __GNUG__ */
+#else	/* __GNUG__ */
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_opengl_glext.h>
+#include <freetype2/ft2build.h>
+#endif
 #include FT_FREETYPE_H
 
 #include <map>
@@ -298,8 +300,8 @@ main(int argc, char *argv[])
 #pragma endregion FreeType2
 
 #pragma region EventLoop
-	// TODO: Find a cross-platform way to handle unicode input. It seems to
-	// have been removed from SDL around the 1.3 release.
+	// TODO: All input is unicode input.
+	SDL_StartTextInput();
 	// TODO: Better event handling mechanism.
 	// TODO: Create a window and game logic class?
 	while (SDL_WaitEvent(&event)) {
@@ -312,6 +314,12 @@ main(int argc, char *argv[])
 		}
 		case SDL_WINDOWEVENT: {
 			break;
+		}
+		case SDL_TEXTINPUT: {
+			cout << event.text.text << std::endl;
+		}
+		case SDL_TEXTEDITING: {
+			cout << event.edit.text << std::endl;
 		}
 		case SDL_KEYDOWN: {
 			if (event.key.repeat)
@@ -329,6 +337,8 @@ main(int argc, char *argv[])
 		}
 		}
 	}
+
+	SDL_StopTextInput();
 #pragma endregion
 
 	return 0;
