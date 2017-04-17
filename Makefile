@@ -12,7 +12,7 @@ BIN=console.exe
 .phony: clean
 
 ${BIN}: ${OBJ}	
-	${CXX} ${LIB} ${LNK} -o $@ $^
+	${CXX} ${LIB} -o $@ $^ ${LNK}
 
 %.o: %.cc
 	${CXX} ${CXF} ${INC} -c -o $@ $<
