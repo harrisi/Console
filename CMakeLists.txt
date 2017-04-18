@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.9)
-project (Console)
+project (console)
 
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "./CMake")
 
@@ -20,9 +20,9 @@ include_directories (${SDL2_INCLUDE_DIRS})
 find_package (Freetype REQUIRED)
 include_directories (${FREETYPE_INCLUDE_DIRS})
 
-set (SOURCES Console.cc)
+set (SOURCES console.cc)
 
 add_executable (${PROJECT_NAME} ${SOURCES})
-target_link_libraries (Console ${OPENGL_LIBRARIES})
-target_link_libraries (Console ${SDL2_LIBRARY})
-target_link_libraries (Console ${FREETYPE_LIBRARIES})
+target_link_libraries (console ${OPENGL_LIBRARIES})
+target_link_libraries (console ${SDL2_LIBRARY})
+target_link_libraries (console ${FREETYPE_LIBRARIES})
