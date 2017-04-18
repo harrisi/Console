@@ -7,7 +7,7 @@
 
 // TODO: Search for better and more exclusive macros. Possibly configure CMake
 // to avoid include location variance.
-#ifdef	__MINGW32__
+#if	defined(_MSC_VER) || defined(__MINGW32__)
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_opengl_glext.h>
