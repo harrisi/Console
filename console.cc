@@ -43,6 +43,7 @@ public:
 	unsigned bearing_x, bearing_y;
 	// TODO: Should internal format of 1/64ths of a point be kept?
 	unsigned advance_x, advance_y;
+	unsigned face_height;
 	GLuint width, height;
 	GLuint texture;
 	glyph();
@@ -80,6 +81,7 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	bearing_y = face->glyph->bitmap_top;
 	advance_x = face->glyph->advance.x;
 	advance_y = face->glyph->advance.y;
+	face_height = face->height;
 
 	GLubyte *bitmap = new GLubyte[width * height * 2];
 	memset(bitmap, 0, width * height * 2);
@@ -116,6 +118,16 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	delete[] bitmap;
 }
 
+// TODO: Encapsulate in a class.
+// TODO: Create variables for orthographic projection limits.
+int window_width, window_height, displays;
+float ddpi, vdpi, hdpi;
+GLuint texture;
+glyph a, current;
+
+string initial_glyphs = "abcdefghijklmnopqrstuvwxyz0123456789";
+map<string, glyph> book;
+
 // TODO: Consider handling font metrics inside this function.
 // TODO: Figure out how to scale fonts properly when taking into account the
 // size of the screen.
@@ -126,14 +138,19 @@ glyph::render(float x, float y)
 		//throw exception("Attempt to draw unintitialized glyph.");
 	}
 
+	cout << face_height / 64 << std::endl;
+
 	// TODO: Use OpenGL 4.0 vector buffer objects and vertex array objects.
 	// TODO: Use shaders to provide font coloring.
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBegin(GL_QUADS);
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-	float w = 2.0f / WINDOW_WIDTH * width,
-		  h = 2.0f / WINDOW_HEIGHT * height;
+	x = x;
+	y = y + (1.0f / window_height * (0.0f));
+
+	float w = 1.0f / window_width * width,
+		  h = 1.0f / window_height * height;
 
 	glTexCoord2f(0.0f, 1.0f); glVertex2f(x + 0, y + 0);
 	glTexCoord2f(0.0f, 0.0f); glVertex2f(x + 0, y + h);
@@ -143,14 +160,6 @@ glyph::render(float x, float y)
 	glEnd();
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
-
-// TODO: Encapsulate in a class.
-GLuint width, height;
-GLuint texture;
-glyph a, current;
-
-string initial_glyphs = "abcdefghijklmnopqrstuvwxyz0123456789";
-map<string, glyph> book;
 
 // TODO: Create other functions as appropriate to size the main window based on
 // selected font face.
@@ -171,16 +180,18 @@ render(SDL_Window *window)
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// TODO: Draw taking into account font metrics.
-	float x = 0.0f + 2.0f / WINDOW_WIDTH * (current.bearing_x), // bearing x.
-		  y = 0.0f - 2.0f / WINDOW_HEIGHT * (current.height - current.bearing_y); // height - bearing y.
-	float w = 2.0f / WINDOW_WIDTH * (a.advance_x / 64), // this seems to be too far.
-		  h = 2.0f / WINDOW_HEIGHT * (a.advance_y / 64);
+	// All characters need to be raised up by the maximum possible underhang.
+	float x = 0.0f + 1.0f / window_width * (current.bearing_x), // bearing x.
+		  y = (1.0f / window_height * (current.height - current.bearing_y)) - // should be height - max bearing y.
+		      1.0f / window_height * (current.height - current.bearing_y); // height - bearing y.
+	float w = 1.0f / window_width * (a.advance_x / 64), // this seems to be too far.
+		  h = 1.0f / window_height * (a.advance_y / 64);
 
 	// Origin of 0, 0. Texture origin may be below and to the right of this
 	// point.
 
 	a.render(0.0f, 0.0f);
-	current.render(x + w, y);
+	current.render(x + w, 0.0f + y);
 
 	SDL_GL_SwapWindow(window);
 }
@@ -199,8 +210,6 @@ main(int argc, char *argv[])
 	SDL_Window *window;
 	SDL_GLContext context;
 	SDL_Event event;
-	int width, height, displays;
-	float ddpi, vdpi, hdpi;
 
 #pragma region SDL2
 	if (SDL_Init(SDL_INIT_VIDEO)) {
@@ -245,11 +254,11 @@ main(int argc, char *argv[])
 	// TODO: Verify this works.
 	// Some OSes will automatically scale windows when using a high DPI screen.
 	// This should undo that.
-	SDL_GL_GetDrawableSize(window, &width, &height);
-	cout << "Width: " << width << std::endl;
-	cout << "Height: " << height << std::endl;
+	SDL_GL_GetDrawableSize(window, &window_width, &window_height);
+	cout << "Width: " << window_width << std::endl;
+	cout << "Height: " << window_height << std::endl;
 
-	glViewport(0, 0, width, height);
+	glViewport(0, 0, window_width, window_height);
 	glOrtho(0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
 
 	// Necessary to use textures.
