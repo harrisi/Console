@@ -66,8 +66,6 @@
 #  License text for the above reference.)
 
 SET(SDL2_SEARCH_PATHS
-	${SDL2}
-	$ENV{SDL2}
 	~/Library/Frameworks
 	/Library/Frameworks
 	/usr/local
