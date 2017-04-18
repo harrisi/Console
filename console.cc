@@ -7,8 +7,6 @@
 
 // TODO: Search for better and more exclusive macros. Possibly configure CMake
 // to avoid include location variance.
-// TODO: Get SDL2 and FreeType2 directory structure from Linux so that
-// directories can be set up that CMake will accept.
 #if	defined(_MSC_VER) || defined(__MINGW32__)
 #include <SDL.h>
 #include <SDL_opengl.h>
