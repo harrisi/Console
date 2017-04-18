@@ -128,6 +128,10 @@ glyph a, current;
 string initial_glyphs = "abcdefghijklmnopqrstuvwxyz0123456789";
 map<string, glyph> book;
 
+// TODO: Create the font cache by iterating through all glyphs in the file and
+// record the largest y bearing for use in positioning the origins of glyphs.
+// TODO: Fix the display of ' and " and possibly more glyphs.
+
 // TODO: Consider handling font metrics inside this function.
 // TODO: Figure out how to scale fonts properly when taking into account the
 // size of the screen.
@@ -179,10 +183,12 @@ render(SDL_Window *window)
 	glClearColor(0.1f, 0.2f, 0.5f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	cout << current.bearing_y << std::endl;
+
 	// TODO: Draw taking into account font metrics.
 	// All characters need to be raised up by the maximum possible underhang.
 	float x = 0.0f + 1.0f / window_width * (current.bearing_x), // bearing x.
-		  y = (1.0f / window_height * (current.height - current.bearing_y)) - // should be height - max bearing y.
+		  y = 0.0f - // should be height - max bearing y.
 		      1.0f / window_height * (current.height - current.bearing_y); // height - bearing y.
 	float w = 1.0f / window_width * (a.advance_x / 64), // this seems to be too far.
 		  h = 1.0f / window_height * (a.advance_y / 64);
