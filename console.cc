@@ -126,7 +126,7 @@ GLuint texture;
 glyph a, current;
 
 string initial_glyphs = "abcdefghijklmnopqrstuvwxyz0123456789";
-// TODO: Make this unicode-aware.
+// TODO: Make this unicode-aware. It was map<string, glyph>.
 map<unsigned char, glyph> book;
 
 // TODO: Create the font cache by iterating through all glyphs in the file and
