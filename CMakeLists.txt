@@ -17,7 +17,7 @@ include_directories (${SDL2_INCLUDE_DIRS})
 #
 # Define FREETYPE_INCLUDE_DIRS manually, and point FREETYPE_LIBRARIES to
 # freetyped.lib.
-find_package (Freetype REQUIRED)
+#find_package (Freetype REQUIRED)
 include_directories (${FREETYPE_INCLUDE_DIRS})
 
 set (SOURCES console.cc)
