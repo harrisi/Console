@@ -37,6 +37,8 @@ using namespace std;
 // capability.
 #define WINDOW_WIDTH	640
 #define WINDOW_HEIGHT	480
+#define SCREEN_ROWS		10
+#define SCREEN_COLS		10
 
 class glyph {
 public:
@@ -120,16 +122,24 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	delete[] bitmap;
 }
 
+// TODO: Make these non-global.
+// TODO: Better error handling.
+// TODO: Put FreeType code in a class.
+FT_Library library;
+FT_Face face;
+FT_UInt index;
+
 // TODO: Encapsulate in a class.
 // TODO: Create variables for orthographic projection limits.
 int window_width, window_height, displays;
 float ddpi, vdpi, hdpi;
 GLuint texture;
-glyph a, current;
 
 string initial_glyphs = "abcdefghijklmnopqrstuvwxyz0123456789";
 // TODO: Make this unicode-aware. It was map<string, glyph>.
 map<unsigned char, glyph> book;
+unsigned char *screen;
+int screen_width, screen_height;
 
 // TODO: Create the font cache by iterating through all glyphs in the file and
 // record the largest y bearing for use in positioning the origins of glyphs.
@@ -178,28 +188,42 @@ get_font_metrics(FT_Face *face)
 	//   values.
 }
 
+// TODO: Determine why this lags the display on Linux and OSX. It may be GPU
+// capability related.
 void
 render(SDL_Window *window)
 {
 	glClearColor(0.1f, 0.2f, 0.5f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	unsigned char a = screen[0 + screen_width * 0],
+				  b = screen[1 + screen_width * 0];
+
+	if (book.find(b) == book.end())
+		book[b] = glyph(face, (FT_ULong)b);
+
+	glyph c = book[a],
+		  d = book[b];
+
+	// TODO: Calculate these positions assuming a grid of monospaced characters.
 	// TODO: Move this into the glyph class or find a better way to centralize it.
 	// TODO: Draw taking into account font metrics.
+	// TODO: Glyphs on Windows are raised up farther than on Linux.
 	// All characters need to be raised up by the maximum possible underhang.
-	float x = 0.0f + 1.0f / window_width * (current.bearing_x), // bearing x.
-		  y = (1.0f / window_height * (-current.descender / 64)) - // should be height - max bearing y.
-		      1.0f / window_height * (current.height - current.bearing_y); // height - bearing y.
-	float w = 1.0f / window_width * (a.advance_x / 64), // this seems to be too far.
-		  h = 1.0f / window_height * (a.advance_y / 64);
+	float x = 0.0f + 1.0f / window_width * (d.bearing_x), // bearing x.
+		  y = (1.0f / window_height * (-d.descender / 64.0f)) - // should be height - max bearing y.
+		      1.0f / window_height * (d.height - d.bearing_y); // height - bearing y.
+	float w = 1.0f / window_width * (c.advance_x / 64.0f), // this seems to be too far.
+		  h = 1.0f / window_height * (c.advance_y / 64.0f);
 
 	// Origin of 0, 0. Texture origin may be below and to the right of this
 	// point.
 
-	float y1 = (1.0f / window_height * (-a.descender / 64)) -
-			    1.0f / window_height * (a.height - a.bearing_y);
-	a.render(0.0f, y1);
-	current.render(x + w, y);
+	float y1 = (1.0f / window_height * (-c.descender / 64.0f)) -
+			    1.0f / window_height * (c.height - c.bearing_y);
+
+	book[screen[0 + screen_width * 0]].render(0.0f, y1);
+	book[screen[1 + screen_width * 0]].render(x + w, y);
 
 	SDL_GL_SwapWindow(window);
 }
@@ -207,29 +231,54 @@ render(SDL_Window *window)
 int
 main(int argc, char *argv[])
 {
-	// TODO: Better error handling.
-	// TODO: Put FreeType code in a class.
-	FT_Library library;
-	FT_Face face;
-	FT_UInt index;
-
 	// TODO: Titleless window.
 	// TODO: Hotkeys for movement - window click and drag, etc.
 	SDL_Window *window;
 	SDL_GLContext context;
 	SDL_Event event;
 
-#pragma region SDL2
 	if (SDL_Init(SDL_INIT_VIDEO)) {
 		cout << "SDL_Init" << std::endl;
 		return -1;
 	}
 
+	if (FT_Init_FreeType(&library)) {
+		cout << "FT_Init_Library" << std::endl;
+		return -1;
+	}
+
+	// TODO: Find a cross-platform way to specify fonts.
+	// TODO: Get a list of suggested fonts. Consider Consolas, Lucidia Console.
+	//   consola.ttf, lucon.ttf.
+#ifdef __APPLE__
+	if (FT_New_Face(library, "/Library/Fonts/Andale Mono.ttf", 0, &face)) {
+#elif defined (__GNUG__)
+	if (FT_New_Face(library,
+		"/usr/share/fonts/ubuntu-font-family/UbuntuMono-R.ttf", 0, &face)) {
+#else // WINDOWS
+	if (FT_New_Face(library, "C:\\Windows\\Fonts\\lucon.ttf", 0, &face)) {
+#endif
+		cout << "FT_New_Face" << std::endl;
+		return -1;
+	}
+
+	cout << face->max_advance_height / 64.0f << std::endl;
+	cout << face->max_advance_width / 64.0f << std::endl;
+
+	// TODO: Find why the window is sized improperly.
+	screen_width = (face->max_advance_width / 64.0f) * SCREEN_COLS;
+	screen_height = (face->max_advance_height / 64.0f) * SCREEN_ROWS;
+	screen = new unsigned char[screen_width * screen_height];
+	screen[0 + screen_width * 0] = 'a';
+
+	cout << screen_width << std::endl;
+	cout << screen_height << std::endl;
+
 	// TODO: Use OpenGL 4 features only.
 	// TODO: Better error handling.
 	window = SDL_CreateWindow("Console",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		WINDOW_WIDTH, WINDOW_HEIGHT,
+		screen_width, screen_height,
 		SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_OPENGL);
 	if (!window) {
 		cout << "SDL_CreateWindow: " << SDL_GetError() << std::endl;
@@ -254,8 +303,8 @@ main(int argc, char *argv[])
 		return -1;
 	}
 
-	const GLubyte* renderer = glGetString(GL_RENDERER);
-	const GLubyte* version = glGetString(GL_VERSION);
+	const GLubyte *renderer = glGetString(GL_RENDERER);
+	const GLubyte *version = glGetString(GL_VERSION);
 	cout << "Renderer: " << renderer << std::endl;
 	cout << "Version: " << version << std::endl;
 
@@ -282,28 +331,6 @@ main(int argc, char *argv[])
 	// TODO: Find an extensions loading library or properly load extensions.
 	//wglGetProcAddress("wglGetExtensionsStringARB");
 	//((void (*)(int))wglGetProcAddress("glBlendEquation"))(GL_MAX);
-#pragma endregion
-
-#pragma region FreeType2
-	if (FT_Init_FreeType(&library)) {
-		cout << "FT_Init_Library" << std::endl;
-		return -1;
-	}
-
-	// TODO: Find a cross-platform way to specify fonts.
-	// TODO: Get a list of suggested fonts. Consider Consolas, Lucidia Console.
-	//   consola.ttf, lucon.ttf.
-#ifdef __APPLE__
-        if (FT_New_Face(library, "/Library/Fonts/Andale Mono.ttf", 0, &face)) {
-#elif defined (__GNUG__)
-	if (FT_New_Face(library,
-		"/usr/share/fonts/ubuntu-font-family/UbuntuMono-R.ttf", 0, &face)) {
-#else // WINDOWS
-	if (FT_New_Face(library, "C:\\Windows\\Fonts\\lucon.ttf", 0, &face)) {
-#endif
-		cout << "FT_New_Face" << std::endl;
-		return -1;
-	}
 
 	// TODO: Support multiple monitors and/or monitors with disparate metrics.
 	//   SDL seems to have some transparent support for HiDPI displays, figure
@@ -325,10 +352,12 @@ main(int argc, char *argv[])
 		cout << "FT_Set_Char_Size" << std::endl;
 		return -1;
 	}
-	
-	a = glyph(face, (FT_ULong)'a');
-	current = a;
-#pragma endregion FreeType2
+
+	// TODO: Compartmentalize.
+	// TODO: Support UTF-8.
+	for (auto &c : initial_glyphs) {
+		book[(unsigned char)c] = glyph(face, (FT_ULong)c);
+	}
 
 #pragma region EventLoop
 	// TODO: All input is unicode input.
@@ -349,10 +378,7 @@ main(int argc, char *argv[])
 		case SDL_TEXTINPUT: {
 			unsigned char text = event.text.text[0];
 			cout << text << std::endl;
-			
-			if (book.find(text) == book.end())
-				book[text] = glyph(face, (FT_ULong)text);
-			current = book[text];
+			screen[1 + screen_width * 0] = text;
 		}
 		case SDL_TEXTEDITING: {
 			break;
