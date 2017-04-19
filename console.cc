@@ -196,8 +196,8 @@ render(SDL_Window *window)
 	glClearColor(0.1f, 0.2f, 0.5f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	unsigned char a = screen[0 + screen_width * 0],
-				  b = screen[1 + screen_width * 0];
+	unsigned char a = screen[0 + SCREEN_COLS * 0],
+				  b = screen[1 + SCREEN_COLS * 0];
 
 	if (book.find(b) == book.end())
 		book[b] = glyph(face, (FT_ULong)b);
@@ -205,11 +205,41 @@ render(SDL_Window *window)
 	glyph c = book[a],
 		  d = book[b];
 
-	// TODO: Calculate these positions assuming a grid of monospaced characters.
+	// The first element is at the bottom left.
+	float base_x = 0.0f,
+		  base_y = 0.0f;
+
+	// TODO: Invalid glyphs are drawn.
+	// TODO: All glyphs move with the baseline of the second.
+	for (int i = 0; i < SCREEN_COLS; i++) {
+		for (int j = 0; j < SCREEN_ROWS; j++) {
+			glyph g = book[screen[i + SCREEN_COLS * j]];
+			float x = base_x + 1.0f / window_width * (d.bearing_x),
+				  y = base_y + (1.0f / window_height * (-d.descender / 64.0f)) -
+					  1.0f / window_height * (d.height - d.bearing_y),
+				  w = 1.0f / window_width * (c.advance_x / 64.0f),
+				  h = 1.0f / window_height * (c.advance_y / 64.0f);
+			
+			g.render(x, y);
+			base_x += w;
+
+			// Until this works draw the first glyph only.
+			if (j >= 1) break;
+		}
+
+		base_y += 0.0f;
+		// Until this works draw the first glyph only.
+		if (i >= 1) break;
+	}
+
+	// TODO: There are artifacts drawn when using large sizes.
+	// TODO: face->descender is not the proper value to use.
+	// TODO: Calculate these positions assuming a grid of monospaced glyphs.
 	// TODO: Move this into the glyph class or find a better way to centralize it.
 	// TODO: Draw taking into account font metrics.
 	// TODO: Glyphs on Windows are raised up farther than on Linux.
-	// All characters need to be raised up by the maximum possible underhang.
+	// All glyphs need to be raised up by the maximum possible underhang.
+	/*
 	float x = 0.0f + 1.0f / window_width * (d.bearing_x), // bearing x.
 		  y = (1.0f / window_height * (-d.descender / 64.0f)) - // should be height - max bearing y.
 		      1.0f / window_height * (d.height - d.bearing_y); // height - bearing y.
@@ -222,8 +252,9 @@ render(SDL_Window *window)
 	float y1 = (1.0f / window_height * (-c.descender / 64.0f)) -
 			    1.0f / window_height * (c.height - c.bearing_y);
 
-	book[screen[0 + screen_width * 0]].render(0.0f, y1);
-	book[screen[1 + screen_width * 0]].render(x + w, y);
+	//book[screen[0 + screen_width * 0]].render(0.0f, y1);
+	//book[screen[1 + screen_width * 0]].render(x + w, y);
+	*/
 
 	SDL_GL_SwapWindow(window);
 }
@@ -250,9 +281,10 @@ main(int argc, char *argv[])
 	// TODO: Find a cross-platform way to specify fonts.
 	// TODO: Get a list of suggested fonts. Consider Consolas, Lucidia Console.
 	//   consola.ttf, lucon.ttf.
-#ifdef __APPLE__
+#if defined(__APPLE__)
+	__APPLE__
 	if (FT_New_Face(library, "/Library/Fonts/Andale Mono.ttf", 0, &face)) {
-#elif defined (__GNUG__)
+#elif defined(__GNUG__)
 	if (FT_New_Face(library,
 		"/usr/share/fonts/ubuntu-font-family/UbuntuMono-R.ttf", 0, &face)) {
 #else // WINDOWS
@@ -262,13 +294,37 @@ main(int argc, char *argv[])
 		return -1;
 	}
 
+	// TODO: Support multiple monitors and/or monitors with disparate metrics.
+	//   SDL seems to have some transparent support for HiDPI displays, figure
+	//   out how to use it if possible. How to handle the case where the window
+	//   spans multiple monitors?
+	// TODO: Program displays at reasonable size on OSX but does not display at
+	//   the correct resolution.
+	// Sometimes the glyph textures will have blending artifacts on OSX.
+	if ((displays = SDL_GetNumVideoDisplays()) < 0) {
+		cout << "SDL_GetNumVideoDisplays" << std::endl;
+		return -1;
+	}
+	if (SDL_GetDisplayDPI(0, &ddpi, &hdpi, &vdpi)) {
+		cout << "SDL_GetDisplayDPI" << std::endl;
+		return -1;
+	}
+	// TODO: Windows and MacOS points seem to differ from FreeType2's point.
+	if (FT_Set_Char_Size(face, 0, 12 * 64, hdpi, vdpi)) {
+		cout << "FT_Set_Char_Size" << std::endl;
+		return -1;
+	}
+
 	cout << face->max_advance_height / 64.0f << std::endl;
 	cout << face->max_advance_width / 64.0f << std::endl;
 
 	// TODO: Find why the window is sized improperly.
+	// TODO: Properly handle empty (zero) memory locations. Should they be
+	// spaces?
 	screen_width = (face->max_advance_width / 64.0f) * SCREEN_COLS;
 	screen_height = (face->max_advance_height / 64.0f) * SCREEN_ROWS;
 	screen = new unsigned char[screen_width * screen_height];
+	memset(screen, 0, screen_width * screen_height);
 	screen[0 + screen_width * 0] = 'a';
 
 	cout << screen_width << std::endl;
@@ -309,6 +365,7 @@ main(int argc, char *argv[])
 	cout << "Version: " << version << std::endl;
 
 	// TODO: Verify this works.
+	//   Per testing on OSX this seems to be functional.
 	// Some OSes will automatically scale windows when using a high DPI screen.
 	// This should undo that.
 	SDL_GL_GetDrawableSize(window, &window_width, &window_height);
@@ -332,29 +389,10 @@ main(int argc, char *argv[])
 	//wglGetProcAddress("wglGetExtensionsStringARB");
 	//((void (*)(int))wglGetProcAddress("glBlendEquation"))(GL_MAX);
 
-	// TODO: Support multiple monitors and/or monitors with disparate metrics.
-	//   SDL seems to have some transparent support for HiDPI displays, figure
-	//   out how to use it if possible. How to handle the case where the window
-	//   spans multiple monitors?
-	// TODO: Program displays at reasonable size on OSX but does not display at
-	//   the correct resolution.
-	// Sometimes the glyph textures will have blending artifacts on OSX.
-	if ((displays = SDL_GetNumVideoDisplays()) < 0) {
-		cout << "SDL_GetNumVideoDisplays" << std::endl;
-		return -1;
-	}
-	if (SDL_GetDisplayDPI(0, &ddpi, &hdpi, &vdpi)) {
-		cout << "SDL_GetDisplayDPI" << std::endl;
-		return -1;
-	}
-	// TODO: Windows and MacOS points seem to differ from FreeType2's point.
-	if (FT_Set_Char_Size(face, 0, 9 * 64, hdpi, vdpi)) {
-		cout << "FT_Set_Char_Size" << std::endl;
-		return -1;
-	}
-
 	// TODO: Compartmentalize.
 	// TODO: Support UTF-8.
+	//   Unfortunately it is not possible to iterate through all glyph indices
+	// and recover their code points.
 	for (auto &c : initial_glyphs) {
 		book[(unsigned char)c] = glyph(face, (FT_ULong)c);
 	}
