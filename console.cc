@@ -126,7 +126,8 @@ GLuint texture;
 glyph a, current;
 
 string initial_glyphs = "abcdefghijklmnopqrstuvwxyz0123456789";
-map<string, glyph> book;
+// TODO: Make this unicode-aware.
+map<unsigned char, glyph> book;
 
 // TODO: Create the font cache by iterating through all glyphs in the file and
 // record the largest y bearing for use in positioning the origins of glyphs.
@@ -141,8 +142,6 @@ glyph::render(float x, float y)
 	if (!texture) {
 		//throw exception("Attempt to draw unintitialized glyph.");
 	}
-
-	cout << face_height / 64 << std::endl;
 
 	// TODO: Use OpenGL 4.0 vector buffer objects and vertex array objects.
 	// TODO: Use shaders to provide font coloring.
@@ -182,8 +181,6 @@ render(SDL_Window *window)
 {
 	glClearColor(0.1f, 0.2f, 0.5f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
-
-	cout << current.bearing_y << std::endl;
 
 	// TODO: Draw taking into account font metrics.
 	// All characters need to be raised up by the maximum possible underhang.
@@ -345,8 +342,12 @@ main(int argc, char *argv[])
 			break;
 		}
 		case SDL_TEXTINPUT: {
-			cout << event.text.text << std::endl;
-			current = glyph(face, (FT_ULong)event.text.text[0]);
+			unsigned char text = event.text.text[0];
+			cout << text << std::endl;
+			
+			if (book.find(text) == book.end())
+				book[text] = glyph(face, (FT_ULong)text);
+			current = book[text];
 		}
 		case SDL_TEXTEDITING: {
 			break;
