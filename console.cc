@@ -42,8 +42,10 @@ class glyph {
 public:
 	unsigned bearing_x, bearing_y;
 	// TODO: Should internal format of 1/64ths of a point be kept?
+	// TODO: Make sure all math involving font positioning is floating point.
 	unsigned advance_x, advance_y;
-	unsigned face_height;
+	// TODO: Find a better place to put this.
+	unsigned descender;
 	GLuint width, height;
 	GLuint texture;
 	glyph();
@@ -81,7 +83,7 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	bearing_y = face->glyph->bitmap_top;
 	advance_x = face->glyph->advance.x;
 	advance_y = face->glyph->advance.y;
-	face_height = face->height;
+	descender = face->descender;
 
 	GLubyte *bitmap = new GLubyte[width * height * 2];
 	memset(bitmap, 0, width * height * 2);
@@ -182,10 +184,11 @@ render(SDL_Window *window)
 	glClearColor(0.1f, 0.2f, 0.5f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	// TODO: Move this into the glyph class or find a better way to centralize it.
 	// TODO: Draw taking into account font metrics.
 	// All characters need to be raised up by the maximum possible underhang.
 	float x = 0.0f + 1.0f / window_width * (current.bearing_x), // bearing x.
-		  y = 0.0f - // should be height - max bearing y.
+		  y = (1.0f / window_height * (-current.descender / 64)) - // should be height - max bearing y.
 		      1.0f / window_height * (current.height - current.bearing_y); // height - bearing y.
 	float w = 1.0f / window_width * (a.advance_x / 64), // this seems to be too far.
 		  h = 1.0f / window_height * (a.advance_y / 64);
@@ -193,8 +196,10 @@ render(SDL_Window *window)
 	// Origin of 0, 0. Texture origin may be below and to the right of this
 	// point.
 
-	a.render(0.0f, 0.0f);
-	current.render(x + w, 0.0f + y);
+	float y1 = (1.0f / window_height * (-a.descender / 64)) -
+			    1.0f / window_height * (a.height - a.bearing_y);
+	a.render(0.0f, y1);
+	current.render(x + w, y);
 
 	SDL_GL_SwapWindow(window);
 }
