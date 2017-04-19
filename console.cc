@@ -303,6 +303,7 @@ main(int argc, char *argv[])
 		cout << "SDL_GetDisplayDPI" << std::endl;
 		return -1;
 	}
+	// TODO: Windows and MacOS points seem to differ from FreeType2's point.
 	if (FT_Set_Char_Size(face, 0, 9 * 64, hdpi, vdpi)) {
 		cout << "FT_Set_Char_Size" << std::endl;
 		return -1;
