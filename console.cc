@@ -324,7 +324,7 @@ main(int argc, char *argv[])
 	screen_width = (face->max_advance_width / 64.0f) * SCREEN_COLS;
 	screen_height = (face->max_advance_height / 64.0f) * SCREEN_ROWS;
 	screen = new unsigned char[SCREEN_COLS * SCREEN_ROWS];
-	memset(screen, 0, SCREEN_COLS * SCREEN_ROWS];
+	memset(screen, 0, SCREEN_COLS * SCREEN_ROWS);
 	screen[0 + SCREEN_COLS * 0] = 'a';
 
 	cout << screen_width << std::endl;
