@@ -72,10 +72,10 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	// black.
 	FT_UInt index = FT_Get_Char_Index(face, codepoint);
 	if (FT_Load_Glyph(face, index, FT_LOAD_DEFAULT)) {
-		//throw exception("FT_Load_Glyph");
+		cout << "FT_Load_Glyph" << std::endl;
 	}
 	if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL)) {
-		//throw exception("FT_Render_Glyph");
+		cout << "FT_Render_Glyph" << std::endl;
 	}
 
 	// TODO: Determine the best way to store glyph metrics.
@@ -213,7 +213,7 @@ render(SDL_Window *window)
 	// TODO: All glyphs move with the baseline of the second.
 	for (int i = 0; i < SCREEN_COLS; i++) {
 		for (int j = 0; j < SCREEN_ROWS; j++) {
-			glyph g = book[screen[i + SCREEN_COLS * j]];
+			glyph g = book[screen[j + SCREEN_COLS * i]];
 			float x = base_x + 1.0f / window_width * (d.bearing_x),
 				  y = base_y + (1.0f / window_height * (-d.descender / 64.0f)) -
 					  1.0f / window_height * (d.height - d.bearing_y),
@@ -222,14 +222,11 @@ render(SDL_Window *window)
 			
 			g.render(x, y);
 			base_x += w;
-
-			// Until this works draw the first glyph only.
-			if (j >= 1) break;
 		}
 
-		base_y += 0.0f;
-		// Until this works draw the first glyph only.
-		if (i >= 1) break;
+		base_x  = 0.0f;
+		// TODO: Determine why bbox seems to be twice the actual value.
+		base_y += 1.0f / window_height * (face->bbox.yMax / 64.0f / 2.0f);
 	}
 
 	// TODO: There are artifacts drawn when using large sizes.
@@ -315,14 +312,17 @@ main(int argc, char *argv[])
 		return -1;
 	}
 
-	cout << face->max_advance_height / 64.0f << std::endl;
-	cout << face->max_advance_width / 64.0f << std::endl;
+	// TODO: Figure out why face->bbox values are twice as large as they
+	// should be.
+	cout << face->bbox.xMax / 64.0f << std::endl;
+	cout << face->bbox.yMax / 64.0f << std::endl;
 
 	// TODO: Find why the window is sized improperly.
+	//   Using the values in the bounding box results in a closer size.
 	// TODO: Properly handle empty (zero) memory locations. Should they be
 	// spaces?
-	screen_width = (face->max_advance_width / 64.0f) * SCREEN_COLS;
-	screen_height = (face->max_advance_height / 64.0f) * SCREEN_ROWS;
+	screen_width = (face->bbox.xMax / 64.0f) * SCREEN_COLS;
+	screen_height = (face->bbox.yMax / 64.0f) * SCREEN_ROWS;
 	screen = new unsigned char[SCREEN_COLS * SCREEN_ROWS];
 	memset(screen, 0, SCREEN_COLS * SCREEN_ROWS);
 	screen[0 + SCREEN_COLS * 0] = 'a';
