@@ -127,7 +127,6 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 // TODO: Put FreeType code in a class.
 FT_Library library;
 FT_Face face;
-FT_UInt index;
 
 // TODO: Encapsulate in a class.
 // TODO: Create variables for orthographic projection limits.
