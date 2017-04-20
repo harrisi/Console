@@ -321,7 +321,7 @@ main(int argc, char *argv[])
 	//   Using the values in the bounding box results in a closer size.
 	// TODO: Properly handle empty (zero) memory locations. Should they be
 	// spaces?
-	screen_width = (face->bbox.xMax / 64.0f) * SCREEN_COLS;
+	screen_width = (face->max_advance_width / 64.0f) * SCREEN_COLS;
 	screen_height = (face->bbox.yMax / 64.0f) * SCREEN_ROWS;
 	screen = new unsigned char[SCREEN_COLS * SCREEN_ROWS];
 	memset(screen, 0, SCREEN_COLS * SCREEN_ROWS);
