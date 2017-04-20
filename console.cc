@@ -323,9 +323,9 @@ main(int argc, char *argv[])
 	// spaces?
 	screen_width = (face->max_advance_width / 64.0f) * SCREEN_COLS;
 	screen_height = (face->max_advance_height / 64.0f) * SCREEN_ROWS;
-	screen = new unsigned char[screen_width * screen_height];
-	memset(screen, 0, screen_width * screen_height);
-	screen[0 + screen_width * 0] = 'a';
+	screen = new unsigned char[SCREEN_COLS * SCREEN_ROWS];
+	memset(screen, 0, SCREEN_COLS * SCREEN_ROWS];
+	screen[0 + SCREEN_COLS * 0] = 'a';
 
 	cout << screen_width << std::endl;
 	cout << screen_height << std::endl;
