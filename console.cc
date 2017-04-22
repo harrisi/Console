@@ -278,7 +278,6 @@ main(int argc, char *argv[])
 	// TODO: Get a list of suggested fonts. Consider Consolas, Lucidia Console.
 	//   consola.ttf, lucon.ttf.
 #if defined(__APPLE__)
-	__APPLE__
 	if (FT_New_Face(library, "/Library/Fonts/Andale Mono.ttf", 0, &face)) {
 #elif defined(__GNUG__)
 	if (FT_New_Face(library,
