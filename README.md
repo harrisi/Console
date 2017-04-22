@@ -12,7 +12,7 @@ C++ display front-end using OpenGL for an experimental windowing system.
 * Install the dependencies via your package manager.
 * Run `cmake .`.
 * Run `make`.
-* If there are errors finding FreeType2's includes, run: `g++ `sdl2-config --cflags --libs` `freetype-config --cflags --libs` console.cc -o console`.
+* If there are errors finding FreeType2's includes, run: `g++ $(sdl2-config --cflags --libs) $(freetype-config --cflags --libs) console.cc -o console`.
 
 ## Windows
 
