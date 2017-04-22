@@ -12,7 +12,7 @@ C++ display front-end using OpenGL for an experimental windowing system.
 * Install the dependencies via your package manager.
 * Run `cmake .`.
 * Run `make`.
-* If there are errors finding FreeType2's includes, run: `g++ `sdl2-config --cflags --libs` `freetype-config --cflags --libs` console.cc -o console`.
+* If there are errors finding FreeType2's includes, run: `g++ $(sdl2-config --cflags --libs) $(freetype-config --cflags --libs) --std=c++11 console.cc -o console`.
 
 ## Windows
 
@@ -26,10 +26,8 @@ C++ display front-end using OpenGL for an experimental windowing system.
 Compiling, using brew as prereq gatherer:
 
 * `brew install sdl2 freetype`
-* `g++ -I /usr/local/Cellar/sdl2/2.0.5/include/ -I
-/usr/local/Cellar/freetype/2.7.1/include/ -I
-/usr/local/Cellar/freetype/2.7.1/include/freetype2/ -L /usr/local/lib -lSDL2
--lfreetype -framework OpenGL Console.cc -o Console`
+* `g++ $(sdl2-config --cflags --libs) $(freetype-config --cflags --libs)
+  -framework OpenGL --std=c++11 console.cc -o console`
 
 # TODO
 
