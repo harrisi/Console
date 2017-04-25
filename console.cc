@@ -214,7 +214,7 @@ render(SDL_Window *window)
 		for (int j = 0; j < SCREEN_ROWS; j++) {
 			glyph g = book[screen[j + SCREEN_COLS * i]];
 			float x = base_x + 1.0f / window_width * (g.bearing_x),
-				  y = base_y + (1.0f / window_height * (-(float)g.descender / 64.0f)) -
+				  y = base_y + (1.0f / window_height * (-(int)g.descender / 64.0f)) -
 					  1.0f / window_height * (g.height - g.bearing_y),
 				  w = 1.0f / window_width * (g.advance_x / 64.0f),
 				  h = 1.0f / window_height * (g.advance_y / 64.0f);
@@ -225,7 +225,7 @@ render(SDL_Window *window)
 
 		base_x  = 0.0f;
 		// TODO: Determine why bbox seems to be twice the actual value.
-		base_y += 1.0f / window_height * (face->bbox.yMax / 64.0f / 2.0f);
+		base_y += 1.0f / window_height * (face->max_advance_height / 64.0f / 2.0f);
 	}
 
 	// TODO: There are artifacts drawn when using large sizes.
@@ -319,15 +319,15 @@ main(int argc, char *argv[])
 	//   Using the values in the bounding box results in a closer size.
 	// TODO: Properly handle empty (zero) memory locations. Should they be
 	// spaces?
-	screen_width = (int)(face->max_advance_width / 64.0f) * SCREEN_COLS;
-	screen_height = (int)(face->bbox.yMax / 64.0f) * SCREEN_ROWS;
+	screen_width = (int)((face->max_advance_width / 64.0f) * SCREEN_COLS);
+	screen_height = (int)((face->bbox.yMax / 64.0f) * SCREEN_ROWS);
 	screen = new unsigned char[SCREEN_COLS * SCREEN_ROWS];
 	memset(screen, 0, SCREEN_COLS * SCREEN_ROWS);
 	screen[0 + SCREEN_COLS * 0] = 'a';
 
 	cout << screen_width << std::endl;
 	cout << screen_height << std::endl;
-
+	
 	// TODO: Use OpenGL 4 features only.
 	// TODO: Better error handling.
 	window = SDL_CreateWindow("Console",
