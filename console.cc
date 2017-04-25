@@ -213,11 +213,11 @@ render(SDL_Window *window)
 	for (int i = 0; i < SCREEN_COLS; i++) {
 		for (int j = 0; j < SCREEN_ROWS; j++) {
 			glyph g = book[screen[j + SCREEN_COLS * i]];
-			float x = base_x + 1.0f / window_width * (d.bearing_x),
-				  y = base_y + (1.0f / window_height * (-d.descender / 64.0f)) -
-					  1.0f / window_height * (d.height - d.bearing_y),
-				  w = 1.0f / window_width * (c.advance_x / 64.0f),
-				  h = 1.0f / window_height * (c.advance_y / 64.0f);
+			float x = base_x + 1.0f / window_width * (g.bearing_x),
+				  y = base_y + (1.0f / window_height * (-g.descender / 64.0f)) -
+					  1.0f / window_height * (g.height - g.bearing_y),
+				  w = 1.0f / window_width * (g.advance_x / 64.0f),
+				  h = 1.0f / window_height * (g.advance_y / 64.0f);
 			
 			g.render(x, y);
 			base_x += w;
