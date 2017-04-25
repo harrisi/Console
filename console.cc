@@ -42,13 +42,13 @@ using namespace std;
 
 class glyph {
 public:
-	unsigned bearing_x, bearing_y;
+	int bearing_x, bearing_y;
 	// TODO: Should internal format of 1/64ths of a point be kept?
 	// TODO: Make sure all math involving font positioning is floating point.
-	unsigned advance_x, advance_y;
+	int advance_x, advance_y;
 	// TODO: Find a better place to put this.
-	unsigned descender;
-	GLuint width, height;
+	int descender;
+	int width, height;
 	GLuint texture;
 	glyph();
 	glyph(FT_Face face, FT_ULong codepoint);
