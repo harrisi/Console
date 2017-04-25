@@ -42,12 +42,12 @@ using namespace std;
 
 class glyph {
 public:
-	unsigned bearing_x, bearing_y;
+	int bearing_x, bearing_y;
 	// TODO: Should internal format of 1/64ths of a point be kept?
 	// TODO: Make sure all math involving font positioning is floating point.
-	unsigned advance_x, advance_y;
+	int advance_x, advance_y;
 	// TODO: Find a better place to put this.
-	unsigned descender;
+	int descender;
 	GLuint width, height;
 	GLuint texture;
 	glyph();
@@ -234,23 +234,6 @@ render(SDL_Window *window)
 	// TODO: Move this into the glyph class or find a better way to centralize it.
 	// TODO: Draw taking into account font metrics.
 	// TODO: Glyphs on Windows are raised up farther than on Linux.
-	// All glyphs need to be raised up by the maximum possible underhang.
-	/*
-	float x = 0.0f + 1.0f / window_width * (d.bearing_x), // bearing x.
-		  y = (1.0f / window_height * (-d.descender / 64.0f)) - // should be height - max bearing y.
-		      1.0f / window_height * (d.height - d.bearing_y); // height - bearing y.
-	float w = 1.0f / window_width * (c.advance_x / 64.0f), // this seems to be too far.
-		  h = 1.0f / window_height * (c.advance_y / 64.0f);
-
-	// Origin of 0, 0. Texture origin may be below and to the right of this
-	// point.
-
-	float y1 = (1.0f / window_height * (-c.descender / 64.0f)) -
-			    1.0f / window_height * (c.height - c.bearing_y);
-
-	//book[screen[0 + screen_width * 0]].render(0.0f, y1);
-	//book[screen[1 + screen_width * 0]].render(x + w, y);
-	*/
 
 	SDL_GL_SwapWindow(window);
 }
