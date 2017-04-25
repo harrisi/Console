@@ -98,8 +98,8 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	//   Glyphs still have dark artifacts on some pixels which should be
 	// transparent and letting the background through. This is visible in other
 	// programs, such as PowerShell and Visual Studio 2017.
-	for (int i = 0; i < width; i++)
-		for (int j = 0; j < height; j++) {
+	for (unsigned i = 0; i < width; i++)
+		for (unsigned j = 0; j < height; j++) {
 			bitmap[2 * (i + j * width) + 0] = 0xFF;
 			bitmap[2 * (i + j * width) + 1] = face->glyph->bitmap.buffer[i + j * width];
 		}
@@ -214,7 +214,7 @@ render(SDL_Window *window)
 		for (int j = 0; j < SCREEN_ROWS; j++) {
 			glyph g = book[screen[j + SCREEN_COLS * i]];
 			float x = base_x + 1.0f / window_width * (g.bearing_x),
-				  y = base_y + (1.0f / window_height * (-g.descender / 64.0f)) -
+				  y = base_y + (1.0f / window_height * (-(float)g.descender / 64.0f)) -
 					  1.0f / window_height * (g.height - g.bearing_y),
 				  w = 1.0f / window_width * (g.advance_x / 64.0f),
 				  h = 1.0f / window_height * (g.advance_y / 64.0f);
@@ -305,7 +305,7 @@ main(int argc, char *argv[])
 		return -1;
 	}
 	// TODO: Windows and MacOS points seem to differ from FreeType2's point.
-	if (FT_Set_Char_Size(face, 0, 12 * 64, hdpi, vdpi)) {
+	if (FT_Set_Char_Size(face, 0, 12 * 64, (FT_UInt)hdpi, (FT_UInt)vdpi)) {
 		cout << "FT_Set_Char_Size" << std::endl;
 		return -1;
 	}
@@ -319,8 +319,8 @@ main(int argc, char *argv[])
 	//   Using the values in the bounding box results in a closer size.
 	// TODO: Properly handle empty (zero) memory locations. Should they be
 	// spaces?
-	screen_width = (face->max_advance_width / 64.0f) * SCREEN_COLS;
-	screen_height = (face->bbox.yMax / 64.0f) * SCREEN_ROWS;
+	screen_width = (int)(face->max_advance_width / 64.0f) * SCREEN_COLS;
+	screen_height = (int)(face->bbox.yMax / 64.0f) * SCREEN_ROWS;
 	screen = new unsigned char[SCREEN_COLS * SCREEN_ROWS];
 	memset(screen, 0, SCREEN_COLS * SCREEN_ROWS);
 	screen[0 + SCREEN_COLS * 0] = 'a';
