@@ -48,7 +48,7 @@ public:
 	int advance_x, advance_y;
 	// TODO: Find a better place to put this.
 	int descender;
-	GLuint width, height;
+	int width, height;
 	GLuint texture;
 	glyph();
 	glyph(FT_Face face, FT_ULong codepoint);
@@ -134,7 +134,7 @@ int window_width, window_height, displays;
 float ddpi, vdpi, hdpi;
 GLuint texture;
 
-string initial_glyphs = "abcdefghijklmnopqrstuvwxyz0123456789";
+string initial_glyphs = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()`~-_=+[{]}\\|;:'\",<.>/?";
 // TODO: Make this unicode-aware. It was map<string, glyph>.
 map<unsigned char, glyph> book;
 unsigned char *screen;
