@@ -200,7 +200,8 @@ render(SDL_Window *window)
 		   b = screen[1 + SCREEN_COLS * 0];
 
 	if (book.find(b) == book.end())
-		book[b] = glyph(face, (FT_ULong)b.at(0));
+		if (b.size() > 0)
+			book[b] = glyph(face, (FT_ULong)b.at(0));
 
 	glyph c = book[a],
 		  d = book[b];
@@ -377,10 +378,8 @@ main(int argc, char *argv[])
 	// TODO: Support UTF-8.
 	//   Unfortunately it is not possible to iterate through all glyph indices
 	// and recover their code points.
-	for (auto &c : initial_glyphs) {
-		// TODO: The following construction prints properly, but is not usable in a map. Find why.
+	for (auto &c : initial_glyphs)
 		book[string(1, c)] = glyph(face, (FT_ULong)c);
-	}
 	
 #pragma region EventLoop
 	// TODO: All input is unicode input.
