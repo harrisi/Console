@@ -381,6 +381,9 @@ main(int argc, char *argv[])
 		book["" + c] = glyph(face, (FT_ULong)c);
 	}
 
+	for (auto &g : book)
+		cout << g.first << std::endl;
+
 #pragma region EventLoop
 	// TODO: All input is unicode input.
 	SDL_StartTextInput();
