@@ -98,8 +98,8 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	//   Glyphs still have dark artifacts on some pixels which should be
 	// transparent and letting the background through. This is visible in other
 	// programs, such as PowerShell and Visual Studio 2017.
-	for (unsigned i = 0; i < width; i++)
-		for (unsigned j = 0; j < height; j++) {
+	for (int i = 0; i < width; i++)
+		for (int j = 0; j < height; j++) {
 			bitmap[2 * (i + j * width) + 0] = 0xFF;
 			bitmap[2 * (i + j * width) + 1] = face->glyph->bitmap.buffer[i + j * width];
 		}
@@ -378,12 +378,10 @@ main(int argc, char *argv[])
 	//   Unfortunately it is not possible to iterate through all glyph indices
 	// and recover their code points.
 	for (auto &c : initial_glyphs) {
-		book["" + c] = glyph(face, (FT_ULong)c);
+		// TODO: The following construction prints properly, but is not usable in a map. Find why.
+		book[string(1, c)] = glyph(face, (FT_ULong)c);
 	}
-
-	for (auto &g : book)
-		cout << g.first << std::endl;
-
+	
 #pragma region EventLoop
 	// TODO: All input is unicode input.
 	SDL_StartTextInput();
