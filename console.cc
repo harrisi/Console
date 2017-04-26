@@ -35,8 +35,7 @@ using namespace std;
 // TODO: Window size in pixels needs to be recovered from
 // SDL_GL_GetDrawableSize as some OSes will hide high density display
 // capability.
-#define WINDOW_WIDTH	640
-#define WINDOW_HEIGHT	480
+// TODO: Make these variables.
 #define SCREEN_ROWS		10
 #define SCREEN_COLS		10
 
@@ -300,14 +299,15 @@ main(int argc, char *argv[])
 	cout << face->bbox.xMax / 64.0f << std::endl;
 	cout << face->bbox.yMax / 64.0f << std::endl;
 
+	// TODO: The behavior of the font metrics when multiplied by larger numbers
+	//   seems to imply that they are the wrong values to use.
 	// TODO: Find why the window is sized improperly.
 	//   Using the values in the bounding box results in a closer size.
 	// TODO: Properly handle empty (zero) memory locations. Should they be
 	// spaces?
-	screen_width = (int)((face->max_advance_width / 64.0f) * SCREEN_COLS);
-	screen_height = (int)((face->bbox.yMax / 64.0f) * SCREEN_ROWS);
+	screen_width = (int)((face->max_advance_width / 64.0f / 2.0f) * SCREEN_COLS);
+	screen_height = (int)((face->max_advance_height / 64.0f / 2.0f) * SCREEN_ROWS);
 	screen = new string[SCREEN_COLS * SCREEN_ROWS];
-	//memset(screen, 0, SCREEN_COLS * SCREEN_ROWS);
 	for (int i = 0; i < SCREEN_COLS * SCREEN_ROWS; i++)
 		screen[i] = "";
 	screen[0 + SCREEN_COLS * 0] = "a";
