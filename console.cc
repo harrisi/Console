@@ -134,6 +134,7 @@ int window_width, window_height, displays;
 float ddpi, vdpi, hdpi;
 GLuint texture;
 
+// TODO: Proper glyph caching.
 string initial_glyphs = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()`~-_=+[{]}\\|;:'\",<.>/?";
 // TODO: Make this unicode-aware. It was map<string, glyph>.
 map<string, glyph> book;
@@ -199,7 +200,7 @@ render(SDL_Window *window)
 		   b = screen[1 + SCREEN_COLS * 0];
 
 	if (book.find(b) == book.end())
-		book[b] = glyph(face, (FT_ULong)b.c_str());
+		book[b] = glyph(face, (FT_ULong)b.at(0));
 
 	glyph c = book[a],
 		  d = book[b];
@@ -305,8 +306,10 @@ main(int argc, char *argv[])
 	screen_width = (int)((face->max_advance_width / 64.0f) * SCREEN_COLS);
 	screen_height = (int)((face->bbox.yMax / 64.0f) * SCREEN_ROWS);
 	screen = new string[SCREEN_COLS * SCREEN_ROWS];
-	memset(screen, 0, SCREEN_COLS * SCREEN_ROWS);
-	screen[0 + SCREEN_COLS * 0] = 'a';
+	//memset(screen, 0, SCREEN_COLS * SCREEN_ROWS);
+	for (int i = 0; i < SCREEN_COLS * SCREEN_ROWS; i++)
+		screen[i] = "";
+	screen[0 + SCREEN_COLS * 0] = "a";
 
 	cout << screen_width << std::endl;
 	cout << screen_height << std::endl;
