@@ -136,8 +136,8 @@ GLuint texture;
 
 string initial_glyphs = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()`~-_=+[{]}\\|;:'\",<.>/?";
 // TODO: Make this unicode-aware. It was map<string, glyph>.
-map<unsigned char, glyph> book;
-unsigned char *screen;
+map<string, glyph> book;
+string *screen;
 int screen_width, screen_height;
 
 // TODO: Create the font cache by iterating through all glyphs in the file and
@@ -195,11 +195,11 @@ render(SDL_Window *window)
 	glClearColor(0.1f, 0.2f, 0.5f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	unsigned char a = screen[0 + SCREEN_COLS * 0],
-				  b = screen[1 + SCREEN_COLS * 0];
+	string a = screen[0 + SCREEN_COLS * 0],
+		   b = screen[1 + SCREEN_COLS * 0];
 
 	if (book.find(b) == book.end())
-		book[b] = glyph(face, (FT_ULong)b);
+		book[b] = glyph(face, (FT_ULong)b.c_str());
 
 	glyph c = book[a],
 		  d = book[b];
@@ -304,7 +304,7 @@ main(int argc, char *argv[])
 	// spaces?
 	screen_width = (int)((face->max_advance_width / 64.0f) * SCREEN_COLS);
 	screen_height = (int)((face->bbox.yMax / 64.0f) * SCREEN_ROWS);
-	screen = new unsigned char[SCREEN_COLS * SCREEN_ROWS];
+	screen = new string[SCREEN_COLS * SCREEN_ROWS];
 	memset(screen, 0, SCREEN_COLS * SCREEN_ROWS);
 	screen[0 + SCREEN_COLS * 0] = 'a';
 
@@ -375,7 +375,7 @@ main(int argc, char *argv[])
 	//   Unfortunately it is not possible to iterate through all glyph indices
 	// and recover their code points.
 	for (auto &c : initial_glyphs) {
-		book[(unsigned char)c] = glyph(face, (FT_ULong)c);
+		book["" + c] = glyph(face, (FT_ULong)c);
 	}
 
 #pragma region EventLoop
@@ -395,7 +395,7 @@ main(int argc, char *argv[])
 			break;
 		}
 		case SDL_TEXTINPUT: {
-			unsigned char text = event.text.text[0];
+			string text(event.text.text);
 			cout << text << std::endl;
 			screen[1 + screen_width * 0] = text;
 		}
