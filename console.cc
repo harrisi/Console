@@ -135,6 +135,8 @@ GLuint texture;
 
 // TODO: Proper glyph caching.
 string initial_glyphs = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()`~-_=+[{]}\\|;:'\",<.>/?";
+
+// TODO: Create memory structure for the screen that is shareable between processes.
 // TODO: Make this unicode-aware. It was map<string, glyph>.
 map<string, glyph> book;
 string *screen;
