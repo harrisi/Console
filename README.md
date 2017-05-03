@@ -29,6 +29,19 @@ Compiling, using brew as prereq gatherer:
 * `g++ $(sdl2-config --cflags --libs) $(freetype-config --cflags --libs)
   -framework OpenGL --std=c++11 console.cc -o console`
 
-# TODO
+## TODO
+
+### General
+
+* Migrate TODO items from the source code to this file.
+* Design the shared memory format.
+
+### Rendering
+
+* See code.
+* See comments pertaining to font rasterization.
+
+### Windows
 
 * Figure out why SDL2.dll needs to be present when executable is statically linked.
+	- Can the executable be statically linked on any platform?
