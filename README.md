@@ -38,6 +38,8 @@ Compiling, using brew as prereq gatherer:
 
 ### Rendering
 
+* Fix artifacts drawn around glyphs.
+
 * See code.
 * See comments pertaining to font rasterization.
 
