@@ -189,6 +189,7 @@ get_font_metrics(FT_Face *face)
 	//   values.
 }
 
+// TODO: Turn off toroidal wrapping (?) to disable artifacts on some glyphs.
 // TODO: Determine why this lags the display on Linux and OSX. It may be GPU
 // capability related.
 void
