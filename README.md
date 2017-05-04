@@ -35,6 +35,7 @@ Compiling, using brew as prereq gatherer:
 
 * Migrate TODO items from the source code to this file.
 * Design the shared memory format.
+* Specify rules for GNU `indent`.
 
 ### Rendering
 
