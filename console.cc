@@ -82,14 +82,6 @@ glyph::glyph(FT_Face face, FT_ULong codepoint)
 	GLubyte *bitmap = new GLubyte[width * height * 2];
 	memset(bitmap, 0, width * height * 2);
 
-	// TODO: Remove darkness around edge.
-	//   Treating the glyph bitmap as an alpha channel for a white image
-	// produces a better effect.
-	//   Using duplicated information and glBlendEquation set to GL_MAX
-	// produces good results.
-	//   Glyphs still have dark artifacts on some pixels which should be
-	// transparent and letting the background through. This is visible in other
-	// programs, such as PowerShell and Visual Studio 2017.
 	for (int i = 0; i < width; i++)
 		for (int j = 0; j < height; j++) {
 			bitmap[2 * (i + j * width) + 0] = 0xFF;
