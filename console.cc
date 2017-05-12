@@ -1,10 +1,6 @@
 // Console.cpp : Defines the entry point for the console application.
 //
 
-// TODO: Visual Studo 2017/MS C++ does not allow this to be in a conditional
-// preprocessor block.
-//#include "stdafx.h"
-
 // TODO: Search for better and more exclusive macros. Possibly configure CMake
 // to avoid include location variance.
 #if	defined(_MSC_VER) || defined(__MINGW32__)
