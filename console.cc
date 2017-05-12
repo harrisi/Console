@@ -28,9 +28,6 @@ using namespace std;
 // TODO: Centralize this declaration.
 // TODO: Size window based on selected font size and a number of rows and
 // columns.
-// TODO: Window size in pixels needs to be recovered from
-// SDL_GL_GetDrawableSize as some OSes will hide high density display
-// capability.
 // TODO: Make these variables.
 #define SCREEN_ROWS		10
 #define SCREEN_COLS		10
