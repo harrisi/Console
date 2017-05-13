@@ -198,7 +198,6 @@ render(SDL_Window *window)
 		  base_y = 0.0f;
 
 	// TODO: Invalid glyphs are drawn.
-	// TODO: All glyphs move with the baseline of the second.
 	for (int i = 0; i < SCREEN_COLS; i++) {
 		for (int j = 0; j < SCREEN_ROWS; j++) {
 			glyph g = book[screen[j + SCREEN_COLS * i]];
@@ -304,7 +303,6 @@ main(int argc, char *argv[])
 	cout << screen_height << std::endl;
 	
 	// TODO: Use OpenGL 4 features only.
-	// TODO: Better error handling.
 	window = SDL_CreateWindow("Console",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		screen_width, screen_height,
